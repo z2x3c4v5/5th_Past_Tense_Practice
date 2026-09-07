@@ -1,0 +1,24 @@
+name: Import supplementary artwork
+on:
+  push:
+    branches: [artwork/complete-missing-scenes]
+    paths: [tools/supplementary-artwork-manifest.json]
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import approved supplementary images only
+        run: python3 tools/import-supplementary-artwork.py
+      - name: Commit only newly imported images
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add img/supplementary/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add fixed supplementary illustrations; preserve all original worksheet images'
+            git push
+          fi
