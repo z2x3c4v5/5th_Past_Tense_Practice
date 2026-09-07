@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>English Time Machine · 과거·현재·미래 영어</title>
+  <title>하루 한 장 · 과거형 말하기</title>
   <link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -14,27 +14,15 @@
     <div class="leaf leaf3">🍁</div>
     <div class="leaf leaf4">🍂</div>
     <div class="leaf leaf5">🌰</div>
-    <h1>🍂 English Time Machine</h1>
-    <p id="subtitle" class="subtitle">What did you do this summer? · 여름방학에 한 일을 영어로 말해 봐요!</p>
-
-    <!-- ⏪ 과거 / ⏺ 현재 / ⏩ 미래 -->
-    <div class="tense-switch" role="tablist" aria-label="시제 선택">
-      <button class="tense-btn active" data-tense="past">⏪ 과거 <small>did · ~했어</small></button>
-      <button class="tense-btn" data-tense="present">⏺ 현재 <small>do · ~해</small></button>
-      <button class="tense-btn" data-tense="future">⏩ 미래 <small>will · ~할 거야</small></button>
-    </div>
+    <h1>🍂 하루 한 장 · 과거형 말하기</h1>
+    <p class="subtitle">What did you do this summer? · 워크시트로 쓰고, 여기서 말해요!</p>
   </header>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-tab="suggest">🗣️ 한 일 말하기</button>
-    <button class="tab-btn" data-tab="verbs">🔤 동사 변화표</button>
-    <button class="tab-btn" data-tab="words">📅 때·장소·누구와</button>
-    <button class="tab-btn" data-tab="build">🧩 문장 만들기</button>
-    <button class="tab-btn" data-tab="practice">🎤 내 문장 연습 <span id="practice-count" class="tab-count">0</span></button>
-    <button class="tab-btn" data-tab="daily">📝 하루 한 장 <span id="daily-count" class="tab-count">0/6</span></button>
-  </nav>
+  <!-- 📘 교과서 · Day 1 ~ 6 -->
+  <nav id="day-strip" class="day-strip" aria-label="학습지 고르기"></nav>
 
   <div class="toolbar">
+    <a class="docx-link" href="worksheets/past_tense_worksheet.docx" download>📄 워드 학습지 내려받기</a>
     <label class="speed-control">말하기 속도
       <input id="rate" type="range" min="0.6" max="1.1" step="0.05" value="0.85" />
     </label>
@@ -42,150 +30,16 @@
   </div>
 
   <main>
-    <!-- ===== 한 일 말하기 ===== -->
-    <section id="tab-suggest" class="tab-panel active">
-      <div class="section-block">
-        <div id="tense-banner" class="tense-banner"></div>
-        <h2><span id="suggest-title">여름방학에 한 일</span> <span id="suggest-count" class="count">96개</span></h2>
-        <div class="level-switch">
-          <button class="level-btn active" data-level="beginner">초급</button>
-          <button class="level-btn" data-level="intermediate">중급</button>
-          <button class="level-btn" data-level="advanced">고급</button>
-        </div>
-        <div class="cat-switch">
-          <button class="cat-btn active" data-cat="all">전체</button>
-          <button class="cat-btn" data-cat="make">🍪 만들기·체험</button>
-          <button class="cat-btn" data-cat="active">🏀 운동·배우기</button>
-          <button class="cat-btn" data-cat="trip">🎡 나들이·여행</button>
-          <button class="cat-btn" data-cat="home">🎮 놀이·취미</button>
-        </div>
-        <!-- 과거 시제일 때만 보이는 규칙/불규칙 필터 -->
-        <div id="reg-switch" class="reg-switch">
-          <span class="reg-label">동사 종류</span>
-          <button class="reg-btn active" data-reg="all">전체</button>
-          <button class="reg-btn reg" data-reg="regular">✅ 규칙 동사 (-ed)</button>
-          <button class="reg-btn irr" data-reg="irregular">🔀 불규칙 동사</button>
-        </div>
-        <p id="suggest-hint" class="hint"></p>
-        <div id="suggestion-grid" class="card-grid five"></div>
-      </div>
-    </section>
-
-    <!-- ===== 동사 변화표 ===== -->
-    <section id="tab-verbs" class="tab-panel">
-      <div class="section-block">
-        <h2>🔤 동사 변화표 <span class="count" id="verb-count"></span></h2>
-        <p class="hint">
-          <b>과거</b>를 말할 때는 동사 모양이 바뀌어요. <b>✅ 규칙 동사</b>는 뒤에 <b>-ed</b>를 붙이고,
-          <b>🔀 불규칙 동사</b>는 모양이 제멋대로 바뀌어서 <b>외워야</b> 해요.
-          카드를 누르면 <b>원형 → 과거형</b>을 차례로 들려줘요. (현재는 원형 그대로, 미래는 <b>will + 원형</b>!)
-        </p>
-        <div class="verb-legend">
-          <span class="vl reg">✅ 규칙: play → play<b>ed</b></span>
-          <span class="vl irr">🔀 불규칙: go → <b>went</b></span>
-        </div>
-      </div>
-      <div class="section-block">
-        <h3 class="verb-title reg">✅ 규칙 동사 <span class="verb-sub">(-ed 를 붙여요)</span></h3>
-        <div id="rule-tips" class="rule-tips"></div>
-        <div id="regular-grid" class="verb-grid"></div>
-      </div>
-      <div class="section-block">
-        <h3 class="verb-title irr">🔀 불규칙 동사 <span class="verb-sub">(모양이 바뀌어요 — 외우기!)</span></h3>
-        <div id="irregular-grid" class="verb-grid"></div>
-      </div>
-    </section>
-
-    <!-- ===== 때 · 장소 · 누구와 ===== -->
-    <section id="tab-words" class="tab-panel">
-      <p id="words-hint" class="hint" style="margin-bottom:18px"></p>
-      <div class="section-block">
-        <h2>📅 때 (When) <span class="count">8개</span></h2>
-        <p id="when-hint" class="hint"></p>
-        <div id="day-grid" class="card-grid five"></div>
-      </div>
-      <div class="section-block">
-        <h2>📍 장소 (Where) <span class="count">12개</span></h2>
-        <p id="where-hint" class="hint"></p>
-        <div id="place-grid" class="card-grid five"></div>
-      </div>
-      <div class="section-block">
-        <h2>👫 누구와 (With whom) <span class="count">8개</span></h2>
-        <p id="with-hint" class="hint"></p>
-        <div id="with-grid" class="card-grid five"></div>
-      </div>
-    </section>
-
-    <!-- ===== 문장 만들기 ===== -->
-    <section id="tab-build" class="tab-panel">
-      <div class="section-block">
-        <h2>🧩 나만의 문장 만들기</h2>
-        <p id="build-hint" class="hint"></p>
-
-        <div class="builder">
-          <div class="build-steps">
-            <div class="build-step">
-              <h3 class="build-label">1️⃣ 활동 고르기 <span class="build-sub">(종류별로 골라봐요)</span></h3>
-              <div id="build-activities"></div>
-            </div>
-
-            <div class="build-step">
-              <h3 class="build-label">2️⃣ 언제·어디서·누구와 고르기</h3>
-              <div class="chip-group-title">📅 때 (When)</div>
-              <div id="build-when" class="chip-row"></div>
-              <div class="chip-group-title">📍 장소 (Where)</div>
-              <div id="build-where" class="chip-row"></div>
-              <div class="chip-group-title">👫 누구와 (With whom)</div>
-              <div id="build-with" class="chip-row"></div>
-            </div>
-          </div>
-
-          <div class="build-actions">
-            <button id="build-random" class="btn primary">🎲 무작위 조합</button>
-            <button id="build-clear" class="btn ghost">🧹 다시 고르기</button>
-          </div>
-
-          <div id="build-result" class="build-result empty">
-            활동과 때·장소를 골라보세요! 👆
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 내 문장 연습 ===== -->
-    <section id="tab-practice" class="tab-panel">
-      <div class="section-block">
-        <h2>🎤 내 문장 연습</h2>
-        <p class="hint">⭐로 담은 문장을 마이크로 말해 <b>정확도</b>를 측정해요. 카드의 <b>⏪ 과거 / ⏺ 현재 / ⏩ 미래</b> 표시로 어떤 시제인지, <b>🙋 / 🧩</b> 표시로 어디서 담았는지 알 수 있어요.</p>
-        <p id="practice-empty" class="practice-empty">
-          아직 담은 문장이 없어요! <b>한 일 말하기</b>나 <b>문장 만들기</b> 탭에서 <b>⭐</b>로 연습할 문장을 담아보세요.
-        </p>
-        <div id="practice-list" class="card-grid practice-grid"></div>
-      </div>
-    </section>
-    <!-- ===== 📝 하루 한 장 학습지 ===== -->
-    <section id="tab-daily" class="tab-panel">
-      <div class="section-block">
-        <h2>📝 하루 한 장 · 과거형 학습지 <span id="daily-progress-badge" class="count"></span></h2>
-        <p class="hint">
-          워드 학습지(학습지 1~3, 앞·뒷면)를 <b>하루에 한 면씩</b> 옮겨 놓았어요. ① 동사를 <b>세 번씩 써 보고</b>
-          ② 그림을 보고 <b>과거형으로 문장을 완성</b>한 다음 ③ 완성한 문장을 <b>듣고 마이크로 따라 말해요</b>.
-          입력한 내용은 이 브라우저에 저장돼요.
-          <a id="daily-docx" class="docx-link" href="worksheets/past_tense_worksheet.docx" download>📄 워드 학습지 원본 내려받기</a>
-        </p>
-        <div id="daily-days" class="day-strip"></div>
-        <div id="daily-sheet" class="daily-sheet"></div>
-      </div>
-    </section>
+    <div id="question-banner" class="question-banner"></div>
+    <div id="sheet" class="sheet"></div>
   </main>
 
   <footer class="app-footer">
-    <span class="voice-status">5학년 영어 · What did you do this summer? / yesterday? 🍁 과거 · 현재 · 미래</span>
+    <span class="voice-status">5학년 영어 · 7단원 과거형 · 워크시트 + 웹 앱 연계 🍁</span>
   </footer>
 
-  <script src="data.js"></script>
-  <script src="illustrations.js"></script>
   <script src="worksheet.js"></script>
+  <script src="illustrations.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

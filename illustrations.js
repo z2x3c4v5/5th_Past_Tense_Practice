@@ -395,5 +395,154 @@
      <text x="110" y="90" font-size="18" font-weight="900" fill="#c7d2fe" font-family="sans-serif">z z Z</text>`
   );
 
+
+  /* ---------- 학습지용 추가 장면 ---------- */
+  S.hug = () => wrap(
+    sky("#fef3c7", "#fde68a", "h1") + sun(60, 50, 24, "#fb923c") + ground("#bef264", 190, "#a3e635") +
+    grandma(170, 60, "#a855f7") +
+    `<g transform="translate(232 90)"><g stroke="#fcd9b6" stroke-width="9" stroke-linecap="round"><line x1="-14" y1="50" x2="-46" y2="30"/><line x1="-10" y1="60" x2="-44" y2="56"/></g>
+     <g stroke="#1e3a8a" stroke-width="10" stroke-linecap="round"><line x1="-8" y1="86" x2="-10" y2="106"/><line x1="8" y1="86" x2="10" y2="106"/></g>
+     <rect x="-18" y="44" width="36" height="46" rx="12" fill="#f97316"/><circle cx="0" cy="24" r="20" fill="#fcd9b6"/><path d="M-20 20 Q 0 -6 20 20 Q 10 8 0 10 Q -10 8 -20 20Z" fill="#3f2a1d"/>
+     <circle cx="-7" cy="26" r="2.4" fill="#1f2937"/><circle cx="7" cy="26" r="2.4" fill="#1f2937"/><path d="M-7 33 Q 0 40 7 33" stroke="#b45309" stroke-width="2" fill="none"/></g>` +
+    `<path d="M300 70 q 10 -14 20 0 q -10 14 -20 0z M310 70 q 10 -14 20 0 q -10 14 -20 0z M300 70 q 20 -30 40 0 L 315 100z" fill="#ef4444"/>
+     <path d="M70 120 q 8 -12 16 0 q -8 12 -16 0z M78 120 q 8 -12 16 0 q -8 12 -16 0z M70 120 q 16 -24 32 0 L 82 144z" fill="#f472b6"/>`
+  );
+
+  S.school = () => wrap(
+    sky("#bae6fd", "#e0f2fe", "h2") + sun(60, 50) + cloud(320, 50, 0.8) + ground("#bef264", 190, "#a3e635") +
+    `<rect x="140" y="80" width="220" height="110" fill="#fde68a" stroke="#d97706" stroke-width="3"/><rect x="220" y="50" width="60" height="30" fill="#fde68a" stroke="#d97706" stroke-width="3"/><path d="M215 50 L 250 24 L 285 50z" fill="#ef4444"/>
+     <rect x="236" y="140" width="28" height="50" fill="#92400e"/><rect x="160" y="100" width="24" height="22" fill="#bae6fd"/><rect x="200" y="100" width="24" height="22" fill="#bae6fd"/><rect x="276" y="100" width="24" height="22" fill="#bae6fd"/><rect x="316" y="100" width="24" height="22" fill="#bae6fd"/>
+     <circle cx="250" cy="66" r="9" fill="#fff" stroke="#374151" stroke-width="2"/><path d="M250 60 v 6 h 5" stroke="#374151" stroke-width="2" fill="none"/>
+     <line x1="120" y1="80" x2="120" y2="190" stroke="#6b7280" stroke-width="4"/><path d="M120 80 h 40 v 24 h -40z" fill="#ef4444"/>` +
+    kid(70, 80, "#3b82f6", "run") + `<rect x="46" y="128" width="22" height="28" rx="5" fill="#facc15"/>`
+  );
+
+  S.chair = () => wrap(
+    sky("#fef9c3", "#fde68a", "h3") + `<rect x="0" y="200" width="${W}" height="60" fill="#d6a679"/>` +
+    `<rect x="150" y="60" width="16" height="140" fill="#92400e"/><rect x="150" y="60" width="90" height="16" rx="4" fill="#92400e"/><rect x="150" y="130" width="100" height="14" rx="4" fill="#b45309"/><rect x="236" y="140" width="14" height="60" fill="#92400e"/><rect x="156" y="144" width="12" height="56" fill="#92400e"/>` +
+    kid(200, 50, "#22c55e", "sit")
+  );
+
+  S.present = () => wrap(
+    sky("#fdf2f8", "#fbcfe8", "h4") +
+    `<rect x="80" y="110" width="140" height="110" rx="8" fill="#ef4444"/><rect x="70" y="90" width="160" height="30" rx="6" fill="#dc2626"/><rect x="140" y="90" width="20" height="130" fill="#fde047"/><rect x="70" y="98" width="160" height="14" fill="#fde047"/>
+     <path d="M150 90 q -30 -40 -10 -50 q 14 -4 10 50 q 30 -40 10 -50 q -14 -4 -10 50z" fill="#fde047"/>` +
+    kid(300, 70, "#a855f7", "arms-up") +
+    `<text x="240" y="60" font-size="28" fill="#f472b6">✦</text><text x="40" y="80" font-size="22" fill="#fde047">✦</text>`
+  );
+
+  S.homework = () => wrap(
+    sky("#eef2ff", "#e0e7ff", "h5") + table(40, 180, 320) +
+    `<rect x="110" y="120" width="130" height="62" rx="4" fill="#fff" stroke="#9ca3af" stroke-width="2" transform="rotate(-4 175 150)"/><path d="M125 140 h 90 M125 152 h 70 M125 164 h 80" stroke="#93c5fd" stroke-width="3"/>
+     <rect x="250" y="100" width="8" height="70" rx="3" fill="#fde047" transform="rotate(25 254 135)"/><path d="M262 172 l 8 14 l -14 -4z" fill="#fcd9b6" transform="rotate(25 254 135)"/>` +
+    kid(320, 60, "#f97316", "sit", undefined, undefined, 0.9) +
+    `<text x="60" y="110" font-size="30" font-weight="900" fill="#6366f1" font-family="sans-serif">A+</text>`
+  );
+
+  S.talk = () => wrap(
+    sky("#fef3c7", "#fde68a", "h6") + ground("#bef264", 195, "#a3e635") +
+    kid(140, 80, "#3b82f6", "wave") +
+    `<g transform="translate(260 80) scale(-1 1)"><g stroke="#fcd9b6" stroke-width="9" stroke-linecap="round"><line x1="-14" y1="52" x2="-24" y2="74"/><line x1="14" y1="50" x2="30" y2="26"/></g>
+     <g stroke="#1e3a8a" stroke-width="10" stroke-linecap="round"><line x1="-8" y1="86" x2="-10" y2="110"/><line x1="8" y1="86" x2="10" y2="110"/></g>
+     <rect x="-18" y="44" width="36" height="46" rx="12" fill="#ec4899"/><circle cx="0" cy="24" r="20" fill="#fcd9b6"/><path d="M-20 20 Q 0 -6 20 20 Q 10 8 0 10 Q -10 8 -20 20Z" fill="#7c2d12"/>
+     <circle cx="-7" cy="26" r="2.4" fill="#1f2937"/><circle cx="7" cy="26" r="2.4" fill="#1f2937"/><path d="M-6 33 Q 0 38 6 33" stroke="#b45309" stroke-width="2" fill="none"/></g>` +
+    `<path d="M60 40 h 90 a 12 12 0 0 1 12 12 v 26 a 12 12 0 0 1 -12 12 h -50 l -14 14 v -14 h -26 a 12 12 0 0 1 -12 -12 v -26 a 12 12 0 0 1 12 -12z" fill="#fff" stroke="#3b82f6" stroke-width="3"/><text x="78" y="72" font-size="18" font-weight="800" fill="#1d4ed8" font-family="sans-serif">Hi!</text>
+     <path d="M250 40 h 90 a 12 12 0 0 1 12 12 v 26 a 12 12 0 0 1 -12 12 h -26 v 14 l -14 -14 h -50 a 12 12 0 0 1 -12 -12 v -26 a 12 12 0 0 1 12 -12z" fill="#fff" stroke="#ec4899" stroke-width="3"/><text x="262" y="72" font-size="18" font-weight="800" fill="#be185d" font-family="sans-serif">Hello!</text>`
+  );
+
+  S.wash = () => wrap(
+    sky("#ecfeff", "#cffafe", "h7") + `<rect x="0" y="0" width="${W}" height="${H}" fill="#e0f2fe" opacity="0.4"/>` +
+    `<rect x="90" y="140" width="220" height="70" rx="20" fill="#e5e7eb"/><ellipse cx="200" cy="150" rx="90" ry="20" fill="#f3f4f6"/><ellipse cx="200" cy="150" rx="70" ry="12" fill="#bae6fd"/>
+     <path d="M200 60 v 40 q 0 20 -20 24" stroke="#9ca3af" stroke-width="10" fill="none" stroke-linecap="round"/><rect x="185" y="46" width="30" height="16" rx="6" fill="#6b7280"/>
+     <path d="M180 124 q 4 14 0 26" stroke="#38bdf8" stroke-width="6" stroke-linecap="round"/>
+     <ellipse cx="160" cy="140" rx="16" ry="12" fill="#fcd9b6"/><ellipse cx="200" cy="142" rx="16" ry="12" fill="#fcd9b6"/>
+     <circle cx="140" cy="110" r="8" fill="#fff" opacity="0.9"/><circle cx="230" cy="100" r="6" fill="#fff" opacity="0.9"/><circle cx="215" cy="120" r="5" fill="#fff" opacity="0.9"/><circle cx="150" cy="90" r="5" fill="#fff" opacity="0.9"/>
+     <rect x="300" y="120" width="40" height="18" rx="6" fill="#f472b6"/>`
+  );
+
+  S.door = () => wrap(
+    sky("#fef3c7", "#fde68a", "h8") + `<rect x="0" y="200" width="${W}" height="60" fill="#d6a679"/>` +
+    `<rect x="230" y="40" width="120" height="160" rx="4" fill="#92400e"/><rect x="238" y="40" width="80" height="160" fill="#b45309" transform="skewY(-8) translate(0 20)"/><rect x="250" y="60" width="40" height="40" fill="#fde68a" opacity="0.5" transform="skewY(-8) translate(0 20)"/><circle cx="306" cy="130" r="6" fill="#fde047" transform="skewY(-8) translate(0 20)"/>
+     <rect x="318" y="44" width="30" height="152" fill="#fef9c3"/>` +
+    kid(150, 80, "#22c55e", "wave")
+  );
+
+  S.help = () => wrap(
+    sky("#fff7ed", "#ffedd5", "h9") + table(30, 180, 200) +
+    `<rect x="60" y="140" width="60" height="40" rx="6" fill="#9ca3af"/><rect x="66" y="132" width="48" height="10" rx="3" fill="#6b7280"/>
+     <circle cx="150" cy="170" r="12" fill="#fff" stroke="#9ca3af" stroke-width="2"/><circle cx="180" cy="170" r="12" fill="#fff" stroke="#9ca3af" stroke-width="2"/>` +
+    `<g transform="translate(300 40)"><path d="M-24 46 L 24 46 L 30 110 L -30 110 Z" fill="#ec4899"/><g stroke="#fcd9b6" stroke-width="9" stroke-linecap="round"><line x1="-18" y1="54" x2="-30" y2="80"/><line x1="18" y1="54" x2="30" y2="80"/></g>
+     <circle cx="0" cy="22" r="22" fill="#fcd9b6"/><path d="M-24 20 Q 0 -10 24 20 Q 14 6 0 8 Q -14 6 -24 20Z" fill="#3f2a1d"/><circle cx="-7" cy="24" r="2.4" fill="#1f2937"/><circle cx="7" cy="24" r="2.4" fill="#1f2937"/><path d="M-7 32 Q 0 38 7 32" stroke="#b45309" stroke-width="2" fill="none"/></g>` +
+    kid(230, 80, "#3b82f6", "stand", undefined, undefined, 0.85) + `<rect x="200" y="140" width="34" height="8" rx="3" fill="#f472b6"/>` +
+    `<path d="M150 60 q 8 -12 16 0 q -8 12 -16 0z M158 60 q 8 -12 16 0 q -8 12 -16 0z M150 60 q 16 -24 32 0 L 162 84z" fill="#ef4444"/>`
+  );
+
+  S.clean = () => wrap(
+    sky("#f5f3ff", "#ede9fe", "h10") + `<rect x="0" y="200" width="${W}" height="60" fill="#d6a679"/>` +
+    `<rect x="40" y="100" width="90" height="100" rx="8" fill="#60a5fa"/><rect x="40" y="90" width="90" height="26" rx="8" fill="#bfdbfe"/>` +
+    kid(230, 70, "#22c55e", "stand") +
+    `<line x1="192" y1="130" x2="150" y2="215" stroke="#a16207" stroke-width="6" stroke-linecap="round"/><path d="M130 205 h 40 l 10 20 h -60z" fill="#fde047"/>
+     <circle cx="330" cy="150" r="6" fill="#fff" opacity="0.9"/><circle cx="350" cy="130" r="5" fill="#fff" opacity="0.9"/><path d="M300 60 l 6 6 M320 40 l 6 6 M340 70 l 6 6" stroke="#c4b5fd" stroke-width="3"/>`
+  );
+
+  S.window = () => wrap(
+    sky("#fde68a", "#fff7ed", "h11") + `<rect x="0" y="0" width="${W}" height="${H}" fill="#fef3c7"/>` +
+    `<rect x="110" y="40" width="180" height="150" rx="6" fill="#92400e"/><rect x="120" y="50" width="160" height="130" fill="#7dd3fc"/><rect x="197" y="50" width="6" height="130" fill="#92400e"/><rect x="120" y="112" width="160" height="6" fill="#92400e"/>
+     <circle cx="160" cy="80" r="14" fill="#fde047"/><path d="M130 170 L 160 140 L 190 170z M210 170 L 245 130 L 280 170z" fill="#4ade80"/>
+     <rect x="90" y="36" width="20" height="160" fill="#f472b6"/><rect x="290" y="36" width="20" height="160" fill="#f472b6"/>` +
+    kid(340, 70, "#3b82f6", "wave", undefined, undefined, 0.85)
+  );
+
+  S.milk = () => wrap(
+    sky("#eff6ff", "#dbeafe", "h12") + table(40, 190, 320) +
+    `<path d="M150 190 v -90 l 20 -30 h 60 l 20 30 v 90z" fill="#fff" stroke="#93c5fd" stroke-width="3"/><path d="M170 70 h 60 l 20 30 h -100z" fill="#bfdbfe"/><rect x="165" y="120" width="70" height="40" rx="6" fill="#3b82f6"/><text x="178" y="147" font-size="18" font-weight="900" fill="#fff" font-family="sans-serif">MILK</text>
+     <rect x="270" y="130" width="40" height="60" rx="6" fill="#fff" stroke="#93c5fd" stroke-width="3"/><rect x="274" y="145" width="32" height="42" fill="#f8fafc"/>` +
+    kid(90, 80, "#f97316", "stand", undefined, undefined, 0.85)
+  );
+
+  S.lunch = () => wrap(
+    sky("#fff7ed", "#fed7aa", "h13") + table(40, 200, 320) +
+    `<ellipse cx="200" cy="170" rx="120" ry="34" fill="#f3f4f6"/><ellipse cx="200" cy="166" rx="105" ry="26" fill="#fff"/>
+     <ellipse cx="150" cy="164" rx="34" ry="16" fill="#fef9c3"/><ellipse cx="150" cy="160" rx="26" ry="10" fill="#fff"/>
+     <circle cx="215" cy="160" r="16" fill="#dc2626"/><circle cx="238" cy="166" r="12" fill="#22c55e"/><rect x="255" y="150" width="30" height="14" rx="4" fill="#f59e0b"/><circle cx="196" cy="172" r="7" fill="#fde047"/>
+     <line x1="70" y1="120" x2="110" y2="180" stroke="#78350f" stroke-width="5" stroke-linecap="round"/><line x1="84" y1="116" x2="120" y2="176" stroke="#78350f" stroke-width="5" stroke-linecap="round"/>
+     <path d="M150 110 q -6 -16 0 -30 M200 104 q 6 -16 0 -30 M250 110 q -6 -16 0 -30" stroke="#e5e7eb" stroke-width="5" stroke-linecap="round" fill="none"/>` +
+    kid(330, 50, "#a855f7", "sit", undefined, undefined, 0.8)
+  );
+
+  S.music = () => wrap(
+    sky("#ede9fe", "#ddd6fe", "h14") +
+    kid(200, 60, "#ec4899", "sit") +
+    `<path d="M170 76 q 30 -44 60 0" stroke="#1f2937" stroke-width="8" fill="none"/><rect x="164" y="72" width="16" height="26" rx="6" fill="#1f2937"/><rect x="220" y="72" width="16" height="26" rx="6" fill="#1f2937"/>` +
+    note(90, 80, "#8b5cf6") + note(310, 70, "#ec4899") + note(120, 150, "#6366f1") + note(300, 150, "#f59e0b") + note(60, 130, "#22d3ee") +
+    `<rect x="150" y="190" width="100" height="14" rx="6" fill="#c4b5fd"/>`
+  );
+
+  S.study = () => wrap(
+    sky("#eef2ff", "#e0e7ff", "h15") + table(40, 180, 320) +
+    `<path d="M110 176 L 160 166 L 210 176 L 210 128 L 160 118 L 110 128z" fill="#fff" stroke="#9ca3af" stroke-width="2"/><line x1="160" y1="118" x2="160" y2="166" stroke="#9ca3af" stroke-width="2"/>
+     <text x="120" y="150" font-size="14" font-weight="800" fill="#6366f1" font-family="sans-serif">ABC</text><text x="170" y="150" font-size="14" font-weight="800" fill="#ec4899" font-family="sans-serif">abc</text>
+     <rect x="240" y="120" width="60" height="50" rx="6" fill="#fde047"/><text x="250" y="152" font-size="16" font-weight="900" fill="#1f2937" font-family="sans-serif">Eng</text>` +
+    kid(330, 60, "#22c55e", "sit", undefined, undefined, 0.9) +
+    `<rect x="60" y="40" width="120" height="60" rx="6" fill="#065f46"/><text x="72" y="78" font-size="18" fill="#fff" font-family="sans-serif">English</text>`
+  );
+
+  S.fruit = () => wrap(
+    sky("#fef3c7", "#fde68a", "h16") +
+    `<rect x="60" y="120" width="280" height="90" rx="10" fill="#c2825b"/><rect x="60" y="110" width="280" height="20" rx="6" fill="#a0613f"/>
+     <path d="M40 60 h 320 l 20 50 h -360z" fill="#ef4444"/><path d="M80 60 h 40 l 10 50 h -40z M160 60 h 40 l 10 50 h -40z M240 60 h 40 l 10 50 h -40z" fill="#fff"/>` +
+    [[100, 150, "#ef4444"], [130, 150, "#ef4444"], [115, 130, "#ef4444"], [190, 150, "#f59e0b"], [220, 150, "#f59e0b"], [205, 130, "#f59e0b"], [280, 150, "#22c55e"], [310, 150, "#22c55e"], [295, 130, "#22c55e"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="15" fill="${c}"/>`).join("") +
+    `<path d="M115 116 l 2 -10 M205 116 l 2 -10" stroke="#78350f" stroke-width="3"/>` +
+    kid(360, 130, "#3b82f6", "stand", undefined, undefined, 0.7)
+  );
+
+  S.letter = () => wrap(
+    sky("#fdf2f8", "#fce7f3", "h17") + table(40, 190, 320) +
+    `<rect x="90" y="90" width="180" height="110" rx="6" fill="#fff" stroke="#f9a8d4" stroke-width="3" transform="rotate(-6 180 145)"/><path d="M110 120 h 130 M110 138 h 100 M110 156 h 120 M110 174 h 80" stroke="#f9a8d4" stroke-width="3" transform="rotate(-6 180 145)"/>
+     <path d="M250 110 l 40 -60" stroke="#fde047" stroke-width="9" stroke-linecap="round"/><path d="M250 110 l -6 12 l 12 -4z" fill="#1f2937"/>
+     <rect x="290" y="140" width="70" height="50" rx="4" fill="#fde68a" stroke="#d97706" stroke-width="2"/><path d="M290 140 l 35 28 l 35 -28" stroke="#d97706" stroke-width="2" fill="none"/>
+     <path d="M330 60 q 8 -12 16 0 q -8 12 -16 0z M338 60 q 8 -12 16 0 q -8 12 -16 0z M330 60 q 16 -24 32 0 L 342 84z" fill="#ef4444"/>`
+  );
+
   window.ILLUSTRATIONS = S;
 })();
