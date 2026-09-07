@@ -1,0 +1,20 @@
+{
+  "base_url": "https://s3.amazonaws.com/document-export-us1.canva.com/gb9yc/DAHUj9gb9yc/1/thumbnail/",
+  "access_key": "AKIAQYCGKMUHVZ3RB6IW",
+  "response_expires": "Tue, 08 Sep 2026 00:26:41 GMT",
+  "images": [
+    {"past":"went","page":1,"date":"20260907T065901Z","expires":62860,"signature":"982f31fffbb0670ea8781668ded3c1f403102dd29d3596128b9e04f750c88bec"},
+    {"past":"made","page":2,"date":"20260907T021319Z","expires":80002,"signature":"9e081e563dc07fca0e6c1ab300b76656e89058b9181faecdf5f41a32088bce83"},
+    {"past":"helped","page":3,"date":"20260907T023720Z","expires":78561,"signature":"33aeeb6761bc173e63492b6fc7074368096979e45a904c0dabd53c6d7fd8bd3f"},
+    {"past":"cleaned","page":4,"date":"20260907T101007Z","expires":51394,"signature":"8463347accd2775ca51fbce99a69b8f5737f176b7934bbf0d965899697dee66e"},
+    {"past":"cooked","page":5,"date":"20260907T132121Z","expires":39920,"signature":"ec54607e39d8a822a7d295dfa73dff6dca4a69d8db610b3854d8663cff3b09da"},
+    {"past":"closed","page":6,"date":"20260907T094130Z","expires":53111,"signature":"f8d0a075b604a6f3476dc17e84093bcb1213ff37e4bcb0e3b316cb4179c34cb1"},
+    {"past":"saw","page":7,"date":"20260907T042717Z","expires":71964,"signature":"4471fffbd9945bc7f541a4b0e5045f1d1f6514e4686504ef5a17f6df14136b6c"},
+    {"past":"sang","page":8,"date":"20260907T223850Z","expires":6471,"signature":"ba1d739ac4cfef61ee5b42e143b750b0f7205506e97390ca0be87df90e8e0d4d"},
+    {"past":"gave","page":9,"date":"20260907T002411Z","expires":86550,"signature":"4a1e761532926b1a5cc815a05be7bd442f92b7b34b4eadbfe2e96c1ffe383a79"},
+    {"past":"took","page":10,"date":"20260907T163521Z","expires":28280,"signature":"1403227ce66098600ca544e9983430eb8bbd26b4721009aa15f4d33362a71414"},
+    {"past":"looked","page":11,"date":"20260907T180713Z","expires":22768,"signature":"aa3d0d4e7bb6615c0057b001b190494ab12b5411f2616a036334636e25cd803c"},
+    {"past":"wanted","page":12,"date":"20260907T162955Z","expires":28606,"signature":"72413f94b32fc6f3ccd9c624f29be239f455195ff440951d2ceef0fe96497579"},
+    {"past":"liked","page":13,"date":"20260907T051705Z","expires":68976,"signature":"c5869ac758c8a0551789f70a3727b7045ce9a3f2824087ebf9a45c838a70e5d9"}
+  ]
+}
