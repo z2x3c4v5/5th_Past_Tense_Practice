@@ -564,3 +564,113 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
 
 /* 시제 배너의 두 번째 질문 */
 .tb-or { font-size: 0.8rem; color: var(--muted); margin: 0 2px; }
+
+/* =========================================================
+ * 📝 하루 한 장 학습지
+ * ========================================================= */
+.docx-link {
+  display: inline-block; margin-left: 6px; padding: 4px 10px; border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1); color: #1d4ed8; font-weight: 800; text-decoration: none; font-size: 0.85rem;
+}
+.docx-link:hover { background: rgba(37, 99, 235, 0.18); }
+.day-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin: 6px 0 16px; }
+@media (max-width: 760px) { .day-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.day-chip {
+  border: 2px solid rgba(234, 88, 12, 0.25); cursor: pointer; border-radius: 16px; padding: 10px 8px;
+  background: rgba(255,255,255,0.85); display: flex; flex-direction: column; align-items: center; gap: 3px;
+  box-shadow: var(--shadow-sm); transition: transform 0.1s, background 0.2s, border-color 0.2s;
+}
+.day-chip:active { transform: scale(0.96); }
+.day-chip .dc-day { font-weight: 900; font-size: 1.05rem; color: var(--primary-dark); }
+.day-chip .dc-title { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+.day-chip .dc-stamp { font-size: 0.72rem; color: var(--muted); font-weight: 700; }
+.day-chip.regular { border-color: rgba(34, 197, 94, 0.45); }
+.day-chip.irregular { border-color: rgba(249, 115, 22, 0.5); }
+.day-chip.today { box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.35), var(--shadow-sm); }
+.day-chip.today .dc-stamp { color: var(--primary); }
+.day-chip.done { background: #fff7ed; }
+.day-chip.done .dc-stamp { color: #c2410c; }
+.day-chip.on { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-color: transparent; }
+.day-chip.on .dc-day, .day-chip.on .dc-title, .day-chip.on .dc-stamp { color: #fff; }
+
+.daily-sheet {
+  background: rgba(255,255,255,0.9); border-radius: 22px; padding: 20px 22px 24px;
+  box-shadow: var(--shadow); border: 2px solid rgba(234, 88, 12, 0.2);
+}
+.daily-sheet.regular { border-color: rgba(34, 197, 94, 0.4); }
+.daily-sheet.irregular { border-color: rgba(249, 115, 22, 0.45); }
+.ws-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 2px dashed rgba(234, 88, 12, 0.2); }
+.ws-num { font-size: 2.2rem; font-weight: 900; color: var(--primary); line-height: 1; }
+.daily-sheet.regular .ws-num { color: #15803d; }
+.daily-sheet.irregular .ws-num { color: #c2410c; }
+.ws-titles { flex: 1; min-width: 200px; }
+.ws-title { font-size: 1.25rem; font-weight: 900; color: var(--text); }
+.ws-sub { font-size: 0.9rem; color: var(--muted); margin-top: 2px; }
+.ws-meta { font-size: 0.78rem; color: var(--muted); text-align: right; line-height: 1.5; }
+.ws-rules { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 4px; }
+.ws-rule {
+  border: 2px solid rgba(34, 197, 94, 0.4); background: #f0fdf4; cursor: pointer; border-radius: 14px; padding: 8px 14px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left;
+}
+.ws-rule .wr-label { font-size: 0.78rem; color: #15803d; font-weight: 800; }
+.ws-rule b { font-size: 1.05rem; color: var(--text); }
+.ws-note { margin: 14px 0 4px; padding: 10px 14px; border-radius: 14px; background: #fff7ed; border: 2px solid rgba(249, 115, 22, 0.4); font-size: 0.92rem; font-weight: 700; color: #9a3412; }
+.ws-section { margin-top: 20px; }
+.ws-section h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 1.05rem; margin: 0 0 10px; color: var(--text); }
+.ws-step { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 900; font-size: 0.9rem; }
+.ws-prog { margin-left: auto; font-size: 0.82rem; font-weight: 800; color: #fff; background: var(--primary); padding: 3px 10px; border-radius: 999px; }
+
+/* 쓰기 표 */
+.ws-table { overflow-x: auto; }
+.ws-row { display: grid; grid-template-columns: 1.3fr 0.7fr 1fr 1fr 1fr 1fr; gap: 6px; align-items: center; padding: 4px 0; min-width: 620px; }
+.ws-thead { font-size: 0.8rem; font-weight: 800; color: var(--muted); text-align: center; border-bottom: 2px solid rgba(234, 88, 12, 0.2); padding-bottom: 6px; margin-bottom: 4px; }
+.ws-thead div:first-child { text-align: left; }
+.ws-verb { border-radius: 12px; padding: 4px 6px; margin-bottom: 4px; transition: background 0.2s; }
+.ws-verb.done { background: rgba(34, 197, 94, 0.12); }
+.ws-verb .ws-row.past { border-bottom: 1.5px dashed rgba(234, 88, 12, 0.15); padding-bottom: 8px; }
+.ws-ko { font-weight: 800; font-size: 0.92rem; color: var(--text); }
+.ws-label { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-align: center; }
+.ws-row.past .ws-label { color: #c2410c; }
+.ws-example { border: none; cursor: pointer; background: rgba(255,255,255,0.9); border: 1.5px solid rgba(234, 88, 12, 0.25); border-radius: 10px; padding: 7px 8px; font-size: 0.95rem; text-align: center; color: var(--text); }
+.ws-example.past b { color: #c2410c; }
+.ws-example:active { transform: scale(0.96); }
+.ws-input {
+  width: 100%; padding: 8px 8px; border-radius: 10px; font-size: 1rem; font-weight: 700; text-align: center;
+  border: 2px solid rgba(234, 88, 12, 0.25); background: #fff; color: var(--text); outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.ws-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.18); }
+.ws-input.ok { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
+.ws-input.bad { border-color: #e11d48; background: #fff1f2; }
+
+/* 문장 완성 카드 */
+.ws-fill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 720px) { .ws-fill-grid { grid-template-columns: 1fr; } }
+.ws-fill { background: rgba(255, 251, 235, 0.9); border: 2px solid rgba(234, 88, 12, 0.2); border-radius: 18px; padding: 14px 16px; }
+.ws-fill .illus { margin: 8px 0 10px; max-width: 320px; margin-left: auto; margin-right: auto; }
+.ws-fill .emoji { font-size: 3.2rem; text-align: center; margin: 8px 0 10px; }
+.wf-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.wf-num { font-weight: 900; color: var(--primary); font-size: 1.1rem; }
+.wf-ko { font-weight: 800; color: var(--text); font-size: 1rem; }
+.wf-base { font-size: 0.82rem; color: var(--muted); }
+.wf-base b { color: var(--primary-dark); }
+.wf-hint { margin-left: auto; border: none; cursor: pointer; background: rgba(234, 88, 12, 0.1); color: var(--primary-dark); font-weight: 800; font-size: 0.8rem; padding: 5px 10px; border-radius: 999px; }
+.wf-line { display: flex; align-items: center; gap: 8px; font-size: 1.35rem; font-weight: 800; color: var(--text); justify-content: center; flex-wrap: wrap; }
+.wf-input { width: 150px; font-size: 1.2rem; }
+.wf-feedback { min-height: 20px; margin-top: 8px; text-align: center; font-weight: 800; font-size: 0.92rem; color: var(--muted); }
+.wf-feedback.good { color: #15803d; }
+.wf-feedback.bad { color: #be123c; }
+.wf-result { margin-top: 10px; padding: 12px; border-radius: 14px; background: #ecfdf5; border: 2px solid rgba(22, 163, 74, 0.4); text-align: center; }
+.wf-result.hidden { display: none; }
+.wf-sentence { font-size: 1.4rem; font-weight: 900; color: var(--primary-dark); }
+.wf-sentence-ko { font-size: 0.95rem; color: var(--text); margin-top: 4px; }
+.wf-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.wf-actions .btn { padding: 9px 14px; font-size: 0.9rem; }
+.btn.mic-inline.recording { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; animation: micpulse 1s ease-in-out infinite; }
+
+/* 완료 도장 */
+.ws-stamp { margin-top: 18px; padding: 14px 16px; border-radius: 16px; text-align: center; background: rgba(255,255,255,0.7); border: 2px dashed rgba(234, 88, 12, 0.3); color: var(--muted); font-size: 0.95rem; }
+.ws-stamp.done { background: #fff7ed; border: 2.5px solid var(--primary); color: var(--text); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ws-stamp-mark { font-size: 1.6rem; font-weight: 900; color: var(--primary); transform: rotate(-3deg); }
+.ws-stamp-date { font-size: 0.95rem; }
+.card-tag.tag-ws { background: linear-gradient(135deg, #16a34a, #15803d); }

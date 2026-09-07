@@ -642,8 +642,8 @@ function makePracticeCard(item) {
   tTag.className = "card-tag tag-tense tag-" + (item.tense || "past");
   tTag.textContent = tenseTag(item.tense || "past");
   const tag = document.createElement("span");
-  tag.className = "card-tag " + (item.type === "combo" ? "tag-combo" : "tag-suggest");
-  tag.textContent = item.type === "combo" ? "🧩 내 문장" : "🙋 한 일";
+  tag.className = "card-tag " + (item.type === "combo" ? "tag-combo" : item.type === "worksheet" ? "tag-ws" : "tag-suggest");
+  tag.textContent = item.type === "combo" ? "🧩 내 문장" : item.type === "worksheet" ? "📝 학습지" : "🙋 한 일";
   tags.append(tTag, tag);
   const remove = document.createElement("button");
   remove.className = "premove";
@@ -863,6 +863,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     synth.cancel();
     hidePopup();
     if (btn.dataset.tab === "practice") renderPractice();
+    if (btn.dataset.tab === "daily") renderDaily();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });
@@ -871,3 +872,332 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 document.getElementById("rate").addEventListener("input", e => {
   speakRate = parseFloat(e.target.value);
 });
+
+/* ===========================================================
+ * 📝 하루 한 장 학습지 (워드 학습지 → Day 1 ~ 6)
+ * - 진행 상황(입력값·완료일)은 localStorage 에 저장
+ * =========================================================== */
+let wsProgress = {};
+try { wsProgress = JSON.parse(localStorage.getItem("ws_progress") || "{}") || {}; } catch (e) {}
+function wsSave() { try { localStorage.setItem("ws_progress", JSON.stringify(wsProgress)); } catch (e) {} }
+function wsDay(day) {
+  if (!wsProgress[day]) wsProgress[day] = { verbs: {}, fill: {}, done: null };
+  return wsProgress[day];
+}
+function wsNorm(s) { return (s || "").trim().toLowerCase(); }
+
+/* 한 면의 완료 여부 계산 */
+function wsStatus(sheet) {
+  const st = wsDay(sheet.day);
+  let vDone = 0;
+  sheet.verbs.forEach((v, i) => {
+    const row = st.verbs[i] || {};
+    const ok = [0, 1, 2].every(k => wsNorm((row.p || [])[k]) === v[1]) &&
+               [0, 1, 2].every(k => wsNorm((row.q || [])[k]) === v[2]);
+    if (ok) vDone++;
+  });
+  let fDone = 0;
+  sheet.fill.forEach((f, i) => { if (wsNorm(st.fill[i]) === f.past) fDone++; });
+  return { vDone, fDone, vTotal: sheet.verbs.length, fTotal: sheet.fill.length,
+    complete: vDone === sheet.verbs.length && fDone === sheet.fill.length };
+}
+function wsCompletedCount() { return WORKSHEET_DAYS.filter(s => wsDay(s.day).done).length; }
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/* 오늘 할 면: 아직 안 끝낸 첫 번째 (모두 끝났으면 마지막) */
+let wsCurrent = null;
+function wsPickToday() {
+  const next = WORKSHEET_DAYS.find(s => !wsDay(s.day).done);
+  return next ? next.day : WORKSHEET_DAYS[WORKSHEET_DAYS.length - 1].day;
+}
+
+function updateDailyBadge() {
+  const c = wsCompletedCount();
+  const el = document.getElementById("daily-count");
+  if (el) el.textContent = `${c}/${WORKSHEET_DAYS.length}`;
+  const b = document.getElementById("daily-progress-badge");
+  if (b) b.textContent = `${c} / ${WORKSHEET_DAYS.length} 장 완료`;
+}
+
+function renderDayStrip() {
+  const strip = document.getElementById("daily-days");
+  strip.innerHTML = "";
+  const today = wsPickToday();
+  WORKSHEET_DAYS.forEach(s => {
+    const st = wsDay(s.day);
+    const b = document.createElement("button");
+    b.className = "day-chip " + s.kind + (st.done ? " done" : "") + (wsCurrent === s.day ? " on" : "") + (today === s.day && !st.done ? " today" : "");
+    b.innerHTML = `<span class="dc-day">Day ${s.day}</span><span class="dc-title">${s.kind === "regular" ? "✅ 규칙" : "🔀 불규칙"}</span>` +
+      (st.done ? `<span class="dc-stamp">🍁 ${st.done}</span>` : (today === s.day ? `<span class="dc-stamp">📌 오늘 할 장</span>` : `<span class="dc-stamp">${s.sheet}</span>`));
+    b.addEventListener("click", () => { wsCurrent = s.day; synth.cancel(); hidePopup(); renderDailySheet(); });
+    strip.appendChild(b);
+  });
+}
+
+function makeWsInput(value, answer, onChange) {
+  const inp = document.createElement("input");
+  inp.type = "text"; inp.className = "ws-input"; inp.value = value || "";
+  inp.autocomplete = "off"; inp.spellcheck = false; inp.placeholder = "";
+  const mark = () => {
+    const v = wsNorm(inp.value);
+    inp.classList.toggle("ok", v === answer);
+    inp.classList.toggle("bad", v !== "" && v !== answer && !answer.startsWith(v));
+  };
+  mark();
+  inp.addEventListener("input", () => { mark(); onChange(inp.value); });
+  return inp;
+}
+
+function renderDailySheet() {
+  const sheet = WORKSHEET_DAYS.find(s => s.day === wsCurrent);
+  const st = wsDay(sheet.day);
+  const box = document.getElementById("daily-sheet");
+  box.innerHTML = "";
+  box.className = "daily-sheet " + sheet.kind;
+  renderDayStrip();
+
+  /* --- 머리글 --- */
+  const head = document.createElement("div");
+  head.className = "ws-head";
+  head.innerHTML = `<div class="ws-num">0${sheet.day}</div>
+    <div class="ws-titles"><div class="ws-title">${sheet.title}</div><div class="ws-sub">${sheet.subtitle}</div></div>
+    <div class="ws-meta">ENGLISH WORKSHEET · 5학년 7단원<br><b>${sheet.sheet}</b> · ${todayStr()}</div>`;
+  box.appendChild(head);
+
+  if (sheet.rules) {
+    const r = document.createElement("div");
+    r.className = "ws-rules";
+    sheet.rules.forEach(x => {
+      const c = document.createElement("button");
+      c.className = "ws-rule";
+      c.innerHTML = `<span class="wr-label">${x.label}</span><b>${x.ex}</b>`;
+      const [a, b2] = x.ex.split("→").map(t => t.trim());
+      c.addEventListener("click", () => speakSequence([a, b2], 0.8));
+      r.appendChild(c);
+    });
+    box.appendChild(r);
+  }
+  if (sheet.note) {
+    const n = document.createElement("div");
+    n.className = "ws-note";
+    n.textContent = "💡 " + sheet.note;
+    box.appendChild(n);
+  }
+
+  /* --- 1. 세 번씩 쓰기 --- */
+  const status = wsStatus(sheet);
+  const sec1 = document.createElement("div");
+  sec1.className = "ws-section";
+  sec1.innerHTML = `<h3><span class="ws-step">1</span> 현재형과 과거형을 읽고, 각각 세 번씩 써요. <span class="ws-prog" id="ws-prog-verbs">${status.vDone} / ${status.vTotal}</span></h3>`;
+  const tbl = document.createElement("div");
+  tbl.className = "ws-table";
+  tbl.innerHTML = `<div class="ws-row ws-thead"><div>뜻</div><div>구분</div><div>보기</div><div>쓰기 ①</div><div>쓰기 ②</div><div>쓰기 ③</div></div>`;
+  sheet.verbs.forEach((v, i) => {
+    const [ko, base, past] = v;
+    const row = st.verbs[i] || (st.verbs[i] = { p: ["", "", ""], q: ["", "", ""] });
+    const wrap = document.createElement("div");
+    wrap.className = "ws-verb";
+    const refresh = () => {
+      const ok = [0, 1, 2].every(k => wsNorm(row.p[k]) === base) && [0, 1, 2].every(k => wsNorm(row.q[k]) === past);
+      wrap.classList.toggle("done", ok);
+      const s2 = wsStatus(sheet);
+      const pe = document.getElementById("ws-prog-verbs");
+      if (pe) pe.textContent = `${s2.vDone} / ${s2.vTotal}`;
+      wsCheckComplete(sheet);
+    };
+    [["현재형", base, "p"], ["과거형", past, "q"]].forEach(([label, ans, key], j) => {
+      const r = document.createElement("div");
+      r.className = "ws-row " + (key === "q" ? "past" : "present");
+      if (j === 0) {
+        const kEl = document.createElement("div"); kEl.className = "ws-ko"; kEl.textContent = ko; r.appendChild(kEl);
+      } else {
+        const sp = document.createElement("div"); sp.className = "ws-ko ws-ko-empty"; r.appendChild(sp);
+      }
+      const lab = document.createElement("div"); lab.className = "ws-label"; lab.textContent = label; r.appendChild(lab);
+      const ex = document.createElement("button");
+      ex.className = "ws-example " + (key === "q" ? "past" : "");
+      ex.innerHTML = `<b>${ans}</b> 🔊`;
+      ex.addEventListener("click", () => speak(ans, 0.8));
+      r.appendChild(ex);
+      for (let k = 0; k < 3; k++) {
+        const cell = document.createElement("div");
+        cell.appendChild(makeWsInput(row[key][k], ans, val => { row[key][k] = val; wsSave(); refresh(); }));
+        r.appendChild(cell);
+      }
+      wrap.appendChild(r);
+    });
+    refresh();
+    tbl.appendChild(wrap);
+  });
+  sec1.appendChild(tbl);
+  box.appendChild(sec1);
+
+  /* --- 2. 문장 완성 + 듣기 + 따라 말하기 --- */
+  const sec2 = document.createElement("div");
+  sec2.className = "ws-section";
+  sec2.innerHTML = `<h3><span class="ws-step">2</span> 그림을 보고, 과거형으로 문장을 완성해요. 완성한 문장은 듣고 따라 말해요! <span class="ws-prog" id="ws-prog-fill">${status.fDone} / ${status.fTotal}</span></h3>`;
+  const grid = document.createElement("div");
+  grid.className = "ws-fill-grid";
+  sheet.fill.forEach((f, i) => grid.appendChild(makeFillCard(sheet, f, i)));
+  sec2.appendChild(grid);
+  box.appendChild(sec2);
+
+  /* --- 완료 도장 --- */
+  const stamp = document.createElement("div");
+  stamp.id = "ws-stamp";
+  box.appendChild(stamp);
+  wsCheckComplete(sheet);
+}
+
+function makeFillCard(sheet, f, i) {
+  const st = wsDay(sheet.day);
+  const full = `${f.before} ${f.past}${f.after ? " " + f.after : "."}`.replace(/\s+\./, ".");
+  const card = document.createElement("div");
+  card.className = "ws-fill";
+  const num = ["①", "②", "③", "④"][i] || (i + 1);
+
+  const top = document.createElement("div");
+  top.className = "wf-top";
+  top.innerHTML = `<span class="wf-num">${num}</span><span class="wf-ko">${f.ko}</span><span class="wf-base">(현재형: <b>${f.base}</b>)</span>`;
+  card.appendChild(top);
+  card.appendChild(makeVisual({ art: f.art, emoji: f.emoji || "📝", en: full }));
+
+  const line = document.createElement("div");
+  line.className = "wf-line";
+  const before = document.createElement("span"); before.textContent = f.before;
+  const inp = makeWsInput(st.fill[i], f.past, val => { st.fill[i] = val; wsSave(); check(false); });
+  inp.classList.add("wf-input");
+  inp.placeholder = "과거형";
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") check(true); });
+  const after = document.createElement("span"); after.textContent = f.after || ".";
+  line.append(before, inp, after);
+  card.appendChild(line);
+
+  const fb = document.createElement("div");
+  fb.className = "wf-feedback";
+  card.appendChild(fb);
+
+  const result = document.createElement("div");
+  result.className = "wf-result hidden";
+  card.appendChild(result);
+
+  const hintBtn = document.createElement("button");
+  hintBtn.className = "wf-hint";
+  hintBtn.textContent = "💡 힌트";
+  hintBtn.addEventListener("click", () => {
+    fb.className = "wf-feedback";
+    fb.textContent = f.past === f.base ? "이 동사는 과거형 철자가 현재형과 같아요!" : `첫 글자는 "${f.past[0]}", 글자 수는 ${f.past.length}개예요.`;
+  });
+  top.appendChild(hintBtn);
+
+  function check(loud) {
+    const v = wsNorm(inp.value);
+    if (v === f.past) {
+      fb.className = "wf-feedback good";
+      fb.textContent = "🎉 정답! 문장을 듣고 따라 말해 보세요.";
+      showResult();
+      if (loud) speak(full);
+    } else {
+      result.classList.add("hidden");
+      if (!v) { fb.className = "wf-feedback"; fb.textContent = ""; }
+      else if (loud) { fb.className = "wf-feedback bad"; fb.textContent = v === f.base ? "그건 현재형이에요. 과거형으로 바꿔 봐요!" : "다시 한번 생각해 봐요."; }
+    }
+    const s2 = wsStatus(sheet);
+    const pe = document.getElementById("ws-prog-fill");
+    if (pe) pe.textContent = `${s2.fDone} / ${s2.fTotal}`;
+    wsCheckComplete(sheet);
+  }
+
+  function showResult() {
+    if (!result.classList.contains("hidden")) return;
+    result.classList.remove("hidden");
+    result.innerHTML = "";
+    const en = document.createElement("div");
+    en.className = "wf-sentence";
+    en.appendChild(buildWords(full, [f.past]));
+    const ko = document.createElement("div");
+    ko.className = "wf-sentence-ko";
+    ko.textContent = f.fullKo;
+    const actions = document.createElement("div");
+    actions.className = "wf-actions";
+    const listen = document.createElement("button");
+    listen.className = "btn primary"; listen.textContent = "🔊 듣기";
+    listen.addEventListener("click", () => speak(full));
+    const mic = document.createElement("button");
+    mic.className = "btn mic-inline"; mic.textContent = "🎙️ 따라 말하기";
+    if (!srSupported) { mic.disabled = true; mic.title = "이 브라우저는 음성 인식을 지원하지 않아요 (Chrome 권장)"; }
+    const micFb = document.createElement("div");
+    micFb.className = "mic-feedback";
+    mic.addEventListener("click", () => {
+      if (recBusy || !srSupported) return;
+      mic.classList.add("recording"); mic.textContent = "🔴 말해보세요...";
+      practiceAttempt(full, {
+        onresult: (score, heard) => {
+          const s = stats[full] || { attempts: 0, best: 0 };
+          s.attempts++; s.best = Math.max(s.best, score); stats[full] = s; persist();
+          const msg = score >= 75 ? "⭐ 훌륭해요!" : score >= 45 ? "👍 좋아요! 한 번 더!" : "🔁 다시 또박또박!";
+          micFb.className = "mic-feedback " + (score >= 45 ? "good" : "bad");
+          micFb.innerHTML = `${msg} (${score}%) · 최고 ${s.best}% · ${s.attempts}회<br><span class="heard">내가 한 발음: ${heard || "(못 들었어요)"}</span>`;
+        },
+        onerror: err => { micFb.className = "mic-feedback bad"; micFb.textContent = err === "not-allowed" ? "마이크 권한을 허용해 주세요." : "다시 시도해 주세요."; },
+        onend: () => { mic.classList.remove("recording"); mic.textContent = "🎙️ 따라 말하기"; },
+      });
+    });
+    const star = document.createElement("button");
+    star.className = "btn";
+    const item = { en: full, ko: f.fullKo, emoji: f.emoji || "📝", art: f.art, verb: [f.base, f.past], regular: sheet.kind === "regular", rule: "ed", tense: "past" };
+    const refreshStar = () => { star.textContent = isSelected(full) ? "✓ 연습 목록에 있음" : "⭐ 연습 목록에 추가"; };
+    refreshStar();
+    star.addEventListener("click", () => { toggleSelect(item, "worksheet"); refreshStar(); });
+    actions.append(listen, mic, star);
+    result.append(en, ko, actions, micFb);
+  }
+
+  check(false);
+  return card;
+}
+
+function wsCheckComplete(sheet) {
+  const st = wsDay(sheet.day);
+  const s = wsStatus(sheet);
+  const stamp = document.getElementById("ws-stamp");
+  if (!stamp) return;
+  if (s.complete && !st.done) {
+    st.done = todayStr();
+    wsSave();
+    renderDayStrip();
+    speak("Great job! You finished today's worksheet.");
+  }
+  if (st.done) {
+    stamp.className = "ws-stamp done";
+    const next = WORKSHEET_DAYS.find(x => !wsDay(x.day).done);
+    stamp.innerHTML = `<div class="ws-stamp-mark">🍁 Day ${sheet.day} 완료!</div><div class="ws-stamp-date">${st.done} 에 다 했어요. ${next ? `내일은 <b>Day ${next.day}</b> 를 해 봐요!` : "여섯 장을 모두 끝냈어요! 🎉"}</div>`;
+    if (next) {
+      const b = document.createElement("button");
+      b.className = "btn primary"; b.textContent = `➡️ Day ${next.day} 로 가기`;
+      b.addEventListener("click", () => { wsCurrent = next.day; renderDailySheet(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+      stamp.appendChild(b);
+    }
+    const reset = document.createElement("button");
+    reset.className = "btn ghost"; reset.textContent = "🧹 이 장 다시 하기";
+    reset.addEventListener("click", () => {
+      if (!confirm(`Day ${sheet.day} 의 입력을 모두 지우고 다시 할까요?`)) return;
+      wsProgress[sheet.day] = { verbs: {}, fill: {}, done: null };
+      wsSave(); renderDailySheet(); updateDailyBadge();
+    });
+    stamp.appendChild(reset);
+  } else {
+    stamp.className = "ws-stamp";
+    stamp.innerHTML = `<div class="ws-stamp-todo">동사 쓰기 <b>${s.vDone}/${s.vTotal}</b> · 문장 완성 <b>${s.fDone}/${s.fTotal}</b> — 다 채우면 오늘 도장을 찍어 줘요! 🍁</div>`;
+  }
+  updateDailyBadge();
+}
+
+function renderDaily() {
+  if (wsCurrent == null) wsCurrent = wsPickToday();
+  renderDailySheet();
+}
+updateDailyBadge();
