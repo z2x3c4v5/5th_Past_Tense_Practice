@@ -8,17 +8,22 @@ permissions:
 jobs:
   import:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Import approved supplementary images only
-        run: python3 tools/import-supplementary-artwork.py
-      - name: Commit only newly imported images
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image decoder
+        run: python -m pip install Pillow
+      - name: Import artwork and verify all original images and lesson content are preserved
+        run: python tools/import-supplementary-artwork.py
+      - name: Commit imported artwork and image connections
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add img/supplementary/
+          git add img/supplementary/ worksheet.js index.html
           if ! git diff --cached --quiet; then
-            git commit -m 'Add fixed supplementary illustrations; preserve all original worksheet images'
+            git commit -m 'Connect 17 fixed supplementary illustrations; preserve all 21 original worksheet images'
             git push
           fi
