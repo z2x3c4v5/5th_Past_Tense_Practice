@@ -1,11 +1,9 @@
 /* =========================================================
  * 🍂 하루 한 장 · 과거형 말하기 (워크시트 + 웹 앱 연계)
- * - 타이핑 없음. 듣고 → 마이크로 따라 말하기만!
- * - Day 1 ~ 6 = 워드 학습지 1~3 앞·뒷면
- *     ① 단어 말하기 : 현재형 → 과거형 (듣기 · 말하기)
- *     ② 문장 말하기 : 그 동사로 만든 짧은 과거 문장 (📘 교과서 표현 포함)
- * - 📘 교과서 표현 6개는 따로 모아서도 연습
- * - 그림: illustrations.js 인라인 SVG
+ * - 타이핑 없음.
+ * - 한 줄 = [단어 (누르면 발음)] [그림] [문장 · 🔊 듣기 · 🎙️ 말하기]
+ * - Day 1 ~ 6 = 워드 학습지 1~3 앞·뒷면, 📘 = 교과서 주요 표현
+ * - 그림: 학습지에 있던 그림(img/) → 없으면 같은 스타일로 생성 → 실패하면 SVG
  * - 음성 출력: SpeechSynthesis / 채점: SpeechRecognition (Chrome 권장)
  * ========================================================= */
 
@@ -29,24 +27,19 @@ function makeUtter(text, rate) {
   if (enVoice) u.voice = enVoice;
   return u;
 }
-function speak(text, rate, onStart, onEnd) {
+function speak(text, rate) {
   if (!synth) return;
   synth.cancel();
-  const u = makeUtter(text, rate);
-  if (onStart) u.onstart = onStart;
-  if (onEnd) u.onend = onEnd;
-  synth.speak(u);
+  synth.speak(makeUtter(text, rate));
 }
-/* 여러 개를 차례로 (현재형 → 과거형) */
-function speakSequence(list, rate, onEnd) {
+function speakSequence(list, rate) {
   if (!synth) return;
   synth.cancel();
   let i = 0;
   const next = () => {
-    if (i >= list.length) { onEnd && onEnd(); return; }
+    if (i >= list.length) return;
     const u = makeUtter(list[i++], rate);
     u.onend = () => setTimeout(next, 300);
-    u.onerror = () => { onEnd && onEnd(); };
     synth.speak(u);
   };
   next();
@@ -91,14 +84,26 @@ function buildWords(sentence, hlForms) {
   return frag;
 }
 
-/* ---------- 일러스트 ---------- */
-function makeVisual(art, label) {
-  const draw = art && window.ILLUSTRATIONS && window.ILLUSTRATIONS[art];
+/* ---------- 그림: 학습지 그림 → 생성 그림 → SVG ---------- */
+function hashSeed(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h % 100000; }
+function genImageUrl(prompt) {
+  const p = encodeURIComponent(`${IMAGE_STYLE}, ${prompt}`);
+  return `https://image.pollinations.ai/prompt/${p}?width=440&height=360&nologo=true&seed=${hashSeed(prompt)}`;
+}
+function makePicture(r) {
   const box = document.createElement("div");
-  box.className = "illus";
-  box.setAttribute("role", "img");
-  box.setAttribute("aria-label", label || "");
-  box.innerHTML = draw ? draw() : "";
+  box.className = "pic";
+  const showSvg = () => {
+    const draw = r.art && window.ILLUSTRATIONS && window.ILLUSTRATIONS[r.art];
+    box.innerHTML = draw ? draw() : `<div class="pic-emoji">📝</div>`;
+    box.classList.add("svg");
+  };
+  const src = r.img || (r.prompt ? genImageUrl(r.prompt) : null);
+  if (!src) { showSvg(); return box; }
+  const img = document.createElement("img");
+  img.alt = r.en; img.loading = "lazy"; img.src = src;
+  img.addEventListener("error", showSvg);
+  box.appendChild(img);
   return box;
 }
 
@@ -157,8 +162,7 @@ function listenFor(target, cb) {
 }
 
 /* ---------- 진행 저장 ----------
- * progress[key] = { best, attempts, listened }   key: "w:played" / "s:I played basketball."
- * doneDays[day] = "2026.09.07"                   */
+ * progress[문장] = { best, attempts, listened }   doneDays[day] = "2026.09.07" */
 let progress = {}, doneDays = {};
 try { progress = JSON.parse(localStorage.getItem("pt_progress") || "{}") || {}; } catch (e) {}
 try { doneDays = JSON.parse(localStorage.getItem("pt_done") || "{}") || {}; } catch (e) {}
@@ -167,65 +171,91 @@ function save() {
 }
 function rec_(key) { return progress[key] || (progress[key] = { best: 0, attempts: 0, listened: false }); }
 const PASS = 45;
-/* 마이크가 없는 브라우저에서는 '듣기'만 해도 완료로 인정 */
+/* 마이크 채점이 안 되는 브라우저에서는 '듣기'만 해도 완료로 인정 */
 function isDone(key) { const r = progress[key]; return !!r && (r.best >= PASS || (!srSupported && r.listened)); }
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
-/* ---------- 말하기 공통 위젯 (듣기 · 마이크 · 결과) ---------- */
-function makeSpeakBox(target, key, listenText, onChange) {
-  const box = document.createElement("div");
-  box.className = "speak-box";
-  const listen = document.createElement("button");
-  listen.className = "btn listen";
-  listen.textContent = "🔊 듣기";
-  listen.addEventListener("click", () => {
-    rec_(key).listened = true; save();
-    const list = Array.isArray(listenText) ? listenText : [listenText];
-    speakSequence(list, null, null);
-    onChange && onChange();
-  });
-  const mic = document.createElement("button");
-  mic.className = "btn mic";
-  mic.innerHTML = "🎙️ 말하기";
-  const fb = document.createElement("div");
-  fb.className = "speak-fb";
-  const r0 = progress[key];
-  const renderFb = (last, heard) => {
-    const r = rec_(key);
-    if (last == null) {
-      fb.className = "speak-fb" + (isDone(key) ? " good" : "");
-      fb.innerHTML = r.attempts ? `최고 <b>${r.best}%</b> · ${r.attempts}회` : (srSupported ? "마이크를 누르고 말해 보세요" : "이 브라우저는 마이크 채점을 지원하지 않아요 (Chrome 권장) · 듣기만 해도 완료!");
-      return;
+/* ---------- 한 줄: 단어 | 그림 | 문장 ---------- */
+function makeRow(r, i, kind, onChange) {
+  const key = r.en;
+  const line = document.createElement("div");
+  line.className = "line " + kind + (r.textbook ? " textbook" : "") + (isDone(key) ? " ok" : "");
+
+  /* 단어: 누르면 발음 */
+  const word = document.createElement("div");
+  word.className = "w";
+  const num = document.createElement("span"); num.className = "w-num"; num.textContent = i + 1;
+  const forms = document.createElement("div");
+  forms.className = "w-forms";
+  const base = document.createElement("button"); base.className = "w-base"; base.textContent = r.base; base.title = "누르면 들려요";
+  base.addEventListener("click", () => speak(r.base, 0.8));
+  const arrow = document.createElement("span"); arrow.className = "w-arrow"; arrow.textContent = "→";
+  const past = document.createElement("button"); past.className = "w-past"; past.textContent = r.past; past.title = "누르면 들려요";
+  past.addEventListener("click", () => speak(r.past, 0.8));
+  forms.append(base, arrow, past);
+  const ko = document.createElement("div"); ko.className = "w-ko"; ko.textContent = r.ko;
+  const both = document.createElement("button"); both.className = "w-both"; both.textContent = "🔊 둘 다 듣기";
+  both.addEventListener("click", () => speakSequence([r.base, r.past], 0.8));
+  word.append(num, forms, ko, both);
+
+  /* 그림 */
+  const pic = makePicture(r);
+
+  /* 문장 */
+  const s = document.createElement("div");
+  s.className = "s";
+  const top = document.createElement("div");
+  top.className = "s-top";
+  if (r.textbook) { const b = document.createElement("span"); b.className = "s-badge"; b.textContent = "📘 교과서 표현"; top.appendChild(b); }
+  const done = document.createElement("span"); done.className = "s-done"; done.textContent = isDone(key) ? "✓" : "";
+  top.appendChild(done);
+  const en = document.createElement("div"); en.className = "s-en"; en.appendChild(buildWords(r.en, [r.past]));
+  const koS = document.createElement("div"); koS.className = "s-ko"; koS.textContent = r.koS;
+  const btns = document.createElement("div"); btns.className = "s-btns";
+  const listen = document.createElement("button"); listen.className = "btn listen"; listen.textContent = "🔊 듣기";
+  const mic = document.createElement("button"); mic.className = "btn mic"; mic.textContent = "🎙️ 말하기";
+  const fb = document.createElement("div"); fb.className = "s-fb";
+  const refresh = (notify) => {
+    const rr = progress[key];
+    line.classList.toggle("ok", isDone(key));
+    done.textContent = isDone(key) ? "✓" : "";
+    if (!rr || !rr.attempts) {
+      fb.className = "s-fb";
+      fb.textContent = srSupported ? "듣고 나서 🎙️ 를 누르고 따라 말해요" : "이 브라우저는 마이크 채점을 지원하지 않아요 (Chrome 권장) · 듣기만 해도 완료!";
     }
-    const msg = last >= 75 ? "⭐ 훌륭해요!" : last >= PASS ? "👍 좋아요!" : "🔁 다시 또박또박!";
-    fb.className = "speak-fb " + (last >= PASS ? "good" : "bad");
-    fb.innerHTML = `${msg} <b>${last}%</b> · 최고 ${r.best}% · ${r.attempts}회<br><span class="heard">내가 한 말: ${heard || "(못 들었어요)"}</span>`;
+    if (notify) onChange && onChange();
   };
-  renderFb(null);
+  listen.addEventListener("click", () => { rec_(key).listened = true; save(); speak(r.en); refresh(true); });
   if (!srSupported) { mic.disabled = true; mic.title = "Chrome 에서 마이크 채점을 쓸 수 있어요"; }
   mic.addEventListener("click", () => {
     if (recBusy || !srSupported) return;
     mic.classList.add("recording"); mic.textContent = "🔴 말해보세요...";
-    fb.className = "speak-fb"; fb.textContent = "또박또박 말해보세요!";
-    listenFor(target, {
+    fb.className = "s-fb"; fb.textContent = "또박또박 말해보세요!";
+    listenFor(r.en, {
       onresult: (score, heard) => {
-        const r = rec_(key);
-        r.attempts++; r.best = Math.max(r.best, score); save();
-        renderFb(score, heard);
+        const rr = rec_(key);
+        rr.attempts++; rr.best = Math.max(rr.best, score); save();
+        const msg = score >= 75 ? "⭐ 훌륭해요!" : score >= PASS ? "👍 좋아요!" : "🔁 다시 또박또박!";
+        fb.className = "s-fb " + (score >= PASS ? "good" : "bad");
+        fb.innerHTML = `${msg} <b>${score}%</b> · 최고 ${rr.best}% · ${rr.attempts}회<br><span class="heard">내가 한 말: ${heard || "(못 들었어요)"}</span>`;
+        line.classList.toggle("ok", isDone(key)); done.textContent = isDone(key) ? "✓" : "";
         onChange && onChange();
       },
-      onerror: err => { fb.className = "speak-fb bad"; fb.textContent = err === "not-allowed" ? "마이크 권한을 허용해 주세요." : "다시 시도해 주세요."; },
-      onend: () => { mic.classList.remove("recording"); mic.innerHTML = "🎙️ 말하기"; },
+      onerror: err => { fb.className = "s-fb bad"; fb.textContent = err === "not-allowed" ? "마이크 권한을 허용해 주세요." : "다시 시도해 주세요."; },
+      onend: () => { mic.classList.remove("recording"); mic.textContent = "🎙️ 말하기"; },
     });
   });
-  const row = document.createElement("div");
-  row.className = "speak-row";
-  row.append(listen, mic);
-  box.append(row, fb);
-  return box;
+  btns.append(listen, mic);
+  s.append(top, en, koS, btns, fb);
+  const r0 = progress[key];
+  if (r0 && r0.attempts) { fb.className = "s-fb" + (isDone(key) ? " good" : ""); fb.innerHTML = `최고 <b>${r0.best}%</b> · ${r0.attempts}회`; }
+  else refresh(false);
+
+  line.append(word, pic, s);
+  return line;
 }
 
 /* ---------- Day / 교과서 고르기 ---------- */
@@ -235,9 +265,8 @@ function nextDay() {
   return n ? n.day : WORKSHEET_DAYS[WORKSHEET_DAYS.length - 1].day;
 }
 function dayStatus(sheet) {
-  const w = sheet.verbs.filter(v => isDone("w:" + v[2])).length;
-  const s = sheet.talk.filter(t => isDone("s:" + t.en)).length;
-  return { w, s, wT: sheet.verbs.length, sT: sheet.talk.length, complete: w === sheet.verbs.length && s === sheet.talk.length };
+  const d = sheet.rows.filter(r => isDone(r.en)).length;
+  return { d, t: sheet.rows.length, complete: d === sheet.rows.length };
 }
 
 function renderStrip() {
@@ -246,7 +275,7 @@ function renderStrip() {
   const today = nextDay();
   const tb = document.createElement("button");
   tb.className = "day-chip textbook" + (current === "textbook" ? " on" : "");
-  const tbDone = TEXTBOOK.filter(t => isDone("s:" + t.en)).length;
+  const tbDone = TEXTBOOK.filter(t => isDone(t.en)).length;
   tb.innerHTML = `<span class="dc-day">📘 교과서</span><span class="dc-title">주요 표현 6</span><span class="dc-stamp">${tbDone}/${TEXTBOOK.length} 말했어요</span>`;
   tb.addEventListener("click", () => { current = "textbook"; go(); });
   strip.appendChild(tb);
@@ -288,46 +317,18 @@ function render() {
   else renderDay(box, WORKSHEET_DAYS.find(s => s.day === current));
 }
 
-function sentenceCard(t, i, refresh) {
-  const card = document.createElement("div");
-  card.className = "scard" + (t.textbook ? " textbook" : "");
-  const key = "s:" + t.en;
-  const top = document.createElement("div");
-  top.className = "sc-top";
-  top.innerHTML = `<span class="sc-num">${i + 1}</span>` + (t.textbook ? `<span class="sc-badge">📘 교과서 표현</span>` : "") +
-    `<span class="sc-verb">${t.verb[0]} → <b>${t.verb[1]}</b></span><span class="sc-done">${isDone(key) ? "✓" : ""}</span>`;
-  card.appendChild(top);
-  card.appendChild(makeVisual(t.art, t.en));
-  const en = document.createElement("div");
-  en.className = "sc-en";
-  en.appendChild(buildWords(t.en, [t.verb[1]]));
-  const ko = document.createElement("div");
-  ko.className = "sc-ko";
-  ko.textContent = t.ko;
-  card.append(en, ko);
-  card.appendChild(makeSpeakBox(t.en, key, t.en, () => {
-    top.querySelector(".sc-done").textContent = isDone(key) ? "✓" : "";
-    card.classList.toggle("ok", isDone(key));
-    refresh && refresh();
-  }));
-  card.classList.toggle("ok", isDone(key));
-  return card;
-}
-
 function renderTextbook(box) {
   const head = document.createElement("div");
   head.className = "sheet-head textbook";
-  head.innerHTML = `<div class="sh-num">📘</div><div class="sh-titles"><div class="sh-title">교과서 주요 표현</div><div class="sh-sub">7단원의 핵심 문장 6개예요. 듣고 따라 말해 보세요. 각 문장은 해당 Day 에서도 다시 나와요.</div></div>`;
+  head.innerHTML = `<div class="sh-num">📘</div><div class="sh-titles"><div class="sh-title">교과서 주요 표현</div><div class="sh-sub">7단원의 핵심 문장 6개예요. 단어를 누르면 발음이 나오고, 문장은 듣고 따라 말해요. (각 문장은 해당 Day 에도 다시 나와요)</div></div>`;
   box.appendChild(head);
-  const grid = document.createElement("div");
-  grid.className = "scard-grid";
-  TEXTBOOK.forEach((t, i) => grid.appendChild(sentenceCard(Object.assign({ textbook: true }, t), i, renderStrip)));
-  box.appendChild(grid);
+  const list = document.createElement("div");
+  list.className = "lines";
+  TEXTBOOK.forEach((r, i) => list.appendChild(makeRow(r, i, r.kind, renderStrip)));
+  box.appendChild(list);
 }
 
 function renderDay(box, sheet) {
-  const st = dayStatus(sheet);
-  if (st.complete && !doneDays[sheet.day]) { doneDays[sheet.day] = todayStr(); save(); renderStrip(); }
   const head = document.createElement("div");
   head.className = "sheet-head " + sheet.kind;
   head.innerHTML = `<div class="sh-num">0${sheet.day}</div>
@@ -337,7 +338,7 @@ function renderDay(box, sheet) {
 
   const guide = document.createElement("div");
   guide.className = "sheet-guide";
-  guide.innerHTML = `📄 워크시트 <b>${sheet.sheet}</b>에 손으로 쓴 다음, 여기서 <b>① 단어</b>를 말하고 <b>② 문장</b>을 말해요. 타이핑은 없어요!`;
+  guide.innerHTML = `📄 워크시트 <b>${sheet.sheet}</b>에 손으로 쓴 다음, 여기서 <b>단어를 눌러 듣고</b> 옆의 <b>문장을 듣고 따라 말해요</b>. 타이핑은 없어요!`;
   box.appendChild(guide);
 
   if (sheet.rules) {
@@ -359,59 +360,25 @@ function renderDay(box, sheet) {
     box.appendChild(n);
   }
 
-  /* ① 단어 말하기 */
-  const sec1 = document.createElement("section");
-  sec1.className = "sec";
-  const h1 = document.createElement("h2");
-  h1.innerHTML = `<span class="step">1</span> 단어 말하기 <small>현재형 → 과거형을 듣고 따라 말해요</small><span class="prog" id="prog-w">${st.w} / ${st.wT}</span>`;
-  sec1.appendChild(h1);
-  const wgrid = document.createElement("div");
-  wgrid.className = "wcard-grid";
-  sheet.verbs.forEach(([ko, base, past]) => {
-    const key = "w:" + past;
-    const c = document.createElement("div");
-    c.className = "wcard " + sheet.kind + (isDone(key) ? " ok" : "");
-    const forms = document.createElement("div");
-    forms.className = "wc-forms";
-    forms.innerHTML = `<span class="wc-base">${base}</span><span class="wc-arrow">→</span><span class="wc-past">${past}</span>`;
-    const meaning = document.createElement("div");
-    meaning.className = "wc-ko";
-    meaning.textContent = ko;
-    const doneMark = document.createElement("span");
-    doneMark.className = "wc-done";
-    doneMark.textContent = isDone(key) ? "✓" : "";
-    c.append(doneMark, forms, meaning);
-    c.appendChild(makeSpeakBox(`${base} ${past}`, key, [base, past], () => {
-      c.classList.toggle("ok", isDone(key));
-      doneMark.textContent = isDone(key) ? "✓" : "";
-      refreshProgress();
-    }));
-    wgrid.appendChild(c);
-  });
-  sec1.appendChild(wgrid);
-  box.appendChild(sec1);
+  const st = dayStatus(sheet);
+  const h = document.createElement("h2");
+  h.className = "sec-title";
+  h.innerHTML = `단어 → 문장 말하기 <small>단어는 눌러서 듣고, 문장은 🔊 듣고 🎙️ 따라 말해요 · 📘 는 교과서 표현</small><span class="prog" id="prog">${st.d} / ${st.t}</span>`;
+  box.appendChild(h);
 
-  /* ② 문장 말하기 */
-  const sec2 = document.createElement("section");
-  sec2.className = "sec";
-  const h2 = document.createElement("h2");
-  h2.innerHTML = `<span class="step">2</span> 문장 말하기 <small>그 단어로 만든 짧은 과거 문장 · 📘 는 교과서 표현</small><span class="prog" id="prog-s">${st.s} / ${st.sT}</span>`;
-  sec2.appendChild(h2);
-  const sgrid = document.createElement("div");
-  sgrid.className = "scard-grid";
-  sheet.talk.forEach((t, i) => sgrid.appendChild(sentenceCard(t, i, refreshProgress)));
-  sec2.appendChild(sgrid);
-  box.appendChild(sec2);
+  const list = document.createElement("div");
+  list.className = "lines";
+  sheet.rows.forEach((r, i) => list.appendChild(makeRow(r, i, sheet.kind, refreshProgress)));
+  box.appendChild(list);
 
-  /* 도장 */
   const stamp = document.createElement("div");
   stamp.id = "stamp";
   box.appendChild(stamp);
 
   function refreshProgress() {
     const s = dayStatus(sheet);
-    document.getElementById("prog-w").textContent = `${s.w} / ${s.wT}`;
-    document.getElementById("prog-s").textContent = `${s.s} / ${s.sT}`;
+    const pe = document.getElementById("prog");
+    if (pe) pe.textContent = `${s.d} / ${s.t}`;
     if (s.complete && !doneDays[sheet.day]) {
       doneDays[sheet.day] = todayStr(); save();
       speak("Great job! You finished today's worksheet.");
@@ -427,7 +394,7 @@ function renderDay(box, sheet) {
       const next = WORKSHEET_DAYS.find(x => !doneDays[x.day]);
       stamp.innerHTML = `<div class="stamp-mark">🍁 Day ${sheet.day} 완료!</div><div class="stamp-date">${doneDays[sheet.day]} 에 다 말했어요. ${next ? `내일은 <b>Day ${next.day}</b>!` : "여섯 장을 모두 끝냈어요! 🎉"}</div>`;
       const row = document.createElement("div");
-      row.className = "speak-row";
+      row.className = "s-btns";
       if (next) {
         const b = document.createElement("button");
         b.className = "btn listen"; b.textContent = `➡️ Day ${next.day} 로 가기`;
@@ -438,17 +405,17 @@ function renderDay(box, sheet) {
       reset.className = "btn ghost"; reset.textContent = "🧹 이 장 다시 하기";
       reset.addEventListener("click", () => {
         if (!confirm(`Day ${sheet.day} 의 기록을 지우고 다시 할까요?`)) return;
-        sheet.verbs.forEach(v => delete progress["w:" + v[2]]);
-        sheet.talk.forEach(t => delete progress["s:" + t.en]);
+        sheet.rows.forEach(r => delete progress[r.en]);
         delete doneDays[sheet.day]; save(); render();
       });
       row.appendChild(reset);
       stamp.appendChild(row);
     } else {
       stamp.className = "stamp";
-      stamp.innerHTML = `단어 <b>${s.w}/${s.wT}</b> · 문장 <b>${s.s}/${s.sT}</b> — 모두 ${PASS}% 이상으로 말하면 오늘 도장을 찍어 줘요! 🍁`;
+      stamp.innerHTML = `문장 <b>${s.d}/${s.t}</b> — 모두 ${PASS}% 이상으로 말하면 오늘 도장을 찍어 줘요! 🍁`;
     }
   }
+  if (st.complete && !doneDays[sheet.day]) { doneDays[sheet.day] = todayStr(); save(); renderStrip(); }
   renderStamp();
 }
 
