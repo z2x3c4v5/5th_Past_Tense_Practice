@@ -11,6 +11,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Check lesson data syntax
+        run: node --check worksheet.js
       - name: Verify production URL, original images, and supplementary images
         env:
           SITE: https://5th-past-tense-practice.vercel.app/
@@ -21,8 +23,15 @@ jobs:
           site = os.environ['SITE']
           sha = os.environ['GITHUB_SHA']
           expected = Path('worksheet.js').read_bytes()
+          original_names = 'played picked baked hugged came ran sat walked talked washed opened drank ate read listened danced studied stopped swam bought wrote'.split()
+          earlier_names = 'joined watched visited learned had got stood did taught put rode drew met said slept used grew'.split()
+          remaining_names = 'went made helped cleaned cooked closed saw sang gave took looked wanted liked'.split()
+          originals = {f'img/{name}.png' for name in original_names}
+          earlier = {f'img/supplementary/{name}.webp' for name in earlier_names}
+          remaining = {f'img/{name}.png' for name in remaining_names}
+          assert len(originals) == 21 and len(earlier) == 17 and len(remaining) == 13
           def get(path, attempt=0):
-              req = urllib.request.Request(site + path + '?artwork_check=' + sha + '&attempt=' + str(attempt), headers={'Cache-Control': 'no-cache', 'User-Agent': 'PastTenseArtworkVerification/1.0'})
+              req = urllib.request.Request(site + path + '?artwork_check=' + sha + '&attempt=' + str(attempt), headers={'Cache-Control': 'no-cache', 'User-Agent': 'PastTenseArtworkVerification/1.1'})
               with urllib.request.urlopen(req, timeout=25) as response:
                   assert response.status == 200
                   return response.read()
@@ -38,8 +47,10 @@ jobs:
           html = get('').decode()
           assert 'worksheet.js?v=artwork-20260907-1' in html
           paths = sorted(set(re.findall(r'img:\s*"([^"]+)"', expected.decode())))
-          assert len(paths) >= 38
-          assert len([p for p in paths if p.endswith('.png')]) == 21
+          # Original images are identified by filename, not PNG extension:
+          # the user uploaded another 13 PNG files alongside the original 21.
+          assert set(paths) == originals | earlier | remaining, 'Missing or unexpected image paths'
+          assert len(paths) == 51
           def verify(path):
               actual = get(path)
               local = Path(path).read_bytes()
@@ -47,11 +58,11 @@ jobs:
               return {'path': path, 'bytes': len(actual), 'sha256': hashlib.sha256(actual).hexdigest(), 'status': 200}
           with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
               verified = list(pool.map(verify, paths))
-          report = {'url': site, 'commit': sha, 'original_images_verified': 21, 'supplementary_images_verified': len(paths)-21, 'images': verified}
+          report = {'url': site, 'commit': sha, 'original_images_verified': len(originals), 'supplementary_images_verified': len(earlier | remaining), 'newly_connected_images_verified': len(remaining), 'images': verified}
           Path('production-artwork-verification.json').write_text(json.dumps(report, indent=2))
           print(json.dumps(report, indent=2))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
-              out.write('## Production artwork verified\n\n' + site + '\n\nOriginal worksheet images: **21, all preserved**.\n\nSupplementary images: **' + str(len(paths)-21) + ', all served successfully**.\n\nAll image bytes match the committed files.\n')
+              out.write('## Production artwork verified\n\n' + site + '\n\nOriginal worksheet images: **21, all present**.\n\nSupplementary images: **30, including the remaining 13 PNGs**.\n\nAll 51 image files return HTTP 200 and match the committed bytes.\n')
           PY
       - uses: actions/upload-artifact@v4
         with:
