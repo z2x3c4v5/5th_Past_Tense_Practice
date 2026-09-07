@@ -2,7 +2,7 @@ name: Import final 13 artwork scenes
 on:
   push:
     branches: [artwork/finish-remaining-13]
-    paths: [tools/remaining-artwork-manifest.json]
+    paths: [tools/remaining-artwork-manifest.json, .github/workflows/import-remaining-artwork.yml]
 permissions:
   contents: write
 jobs:
@@ -22,14 +22,17 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add img/supplementary/ worksheet.js index.html .github/workflows/verify-production-artwork.yml tools/remaining-artwork-report.json
+          # Workflow updates are handled separately by the authorized repository connection.
+          git restore .github/workflows/verify-production-artwork.yml
+          git add img/supplementary/ worksheet.js index.html tools/remaining-artwork-report.json
           git diff --cached --stat
-          git diff --cached --exit-code -- app.js style.css illustrations.js worksheets/ 'img/*.png'
+          git diff --cached --exit-code -- app.js style.css illustrations.js worksheets/ 'img/*.png' .github/workflows/
           if ! git diff --cached --quiet; then
             git commit -m 'Complete all 51 local lesson images; preserve original 21 and previous 17'
             git push
           fi
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: remaining-artwork-review
           path: |
