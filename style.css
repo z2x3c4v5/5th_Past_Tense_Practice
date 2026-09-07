@@ -171,10 +171,12 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
 .listen-all:active { transform: scale(0.94); }
 
 .card .emoji { font-size: 3.4rem; line-height: 1; text-align: center; margin: 4px 0 14px; }
-.card .photo {
-  display: block; width: 100%; height: 150px; object-fit: cover;
-  border-radius: 16px; margin: 4px 0 14px; background: rgba(255,255,255,0.5);
+.card .illus {
+  display: block; width: 100%; aspect-ratio: 400 / 260;
+  border-radius: 16px; margin: 4px 0 14px; overflow: hidden;
+  background: rgba(255,255,255,0.5); box-shadow: inset 0 0 0 1.5px rgba(154, 52, 18, 0.12);
 }
+.card .illus svg { display: block; width: 100%; height: 100%; }
 
 /* 안쪽 문장 박스 */
 .sentence-box {
@@ -299,7 +301,7 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
 
 /* 연습 카드는 조금 작게 */
 .pcard { padding: 14px 16px 16px; display: flex; flex-direction: column; }
-.pcard .photo { height: 108px; margin: 2px 0 10px; }
+.pcard .illus { margin: 2px 0 10px; }
 .pcard .emoji { font-size: 2.5rem; margin: 2px 0 8px; }
 .pcard .en { font-size: 1.05rem; }
 .pcard .ko { font-size: 0.85rem; margin-top: 4px; }
@@ -409,48 +411,6 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
 .speed-control input { accent-color: var(--primary); }
 .voice-status { font-size: 0.78rem; color: var(--muted); }
 
-/* ===== 영역별 내부 스크롤 (전체 페이지 스크롤 최소화) =====
- * 카드는 가로로 채워서 펼치고, 넘치는 부분만 그 영역 안에서 스크롤돼요. */
-#suggestion-grid,
-#day-grid, #place-grid,
-#build-activities,
-#practice-list {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 8px 10px 12px 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(234, 88, 12, 0.55) transparent;
-}
-#suggestion-grid { max-height: clamp(300px, 58vh, 820px); }
-#day-grid, #place-grid { max-height: clamp(170px, 27vh, 420px); }
-#build-activities { max-height: clamp(200px, 40vh, 520px); }
-#practice-list { max-height: clamp(300px, 64vh, 1000px); }
-
-/* 스크롤 영역임을 살짝 표시 (은은한 배경 + 둥근 모서리) */
-#suggestion-grid, #day-grid, #place-grid, #build-activities {
-  background: rgba(255, 255, 255, 0.32);
-  border-radius: 18px;
-}
-
-/* 크롬/사파리 스크롤바 */
-#suggestion-grid::-webkit-scrollbar,
-#day-grid::-webkit-scrollbar, #place-grid::-webkit-scrollbar,
-#build-activities::-webkit-scrollbar,
-#practice-list::-webkit-scrollbar {
-  width: 10px;
-}
-#suggestion-grid::-webkit-scrollbar-thumb,
-#day-grid::-webkit-scrollbar-thumb, #place-grid::-webkit-scrollbar-thumb,
-#build-activities::-webkit-scrollbar-thumb,
-#practice-list::-webkit-scrollbar-thumb {
-  background: rgba(234, 88, 12, 0.5);
-  border-radius: 999px;
-}
-#suggestion-grid::-webkit-scrollbar-thumb:hover,
-#build-activities::-webkit-scrollbar-thumb:hover {
-  background: rgba(234, 88, 12, 0.75);
-}
-
 /* 탭 메뉴는 위에 고정해 어느 영역에서 스크롤하든 항상 보이도록 */
 .tabs {
   position: sticky; top: 0; z-index: 30;
@@ -459,40 +419,9 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
   margin: 0 auto; padding: 12px 14px;
 }
 
-/* ===== 문장 만들기: 모든 칩 줄을 '가로'로 배치 + 좌우 스크롤 ===== */
-#build-activities { max-height: none; overflow-y: visible; min-width: 0; }
-.build-step .chip-row {
-  flex-wrap: nowrap;          /* 줄바꿈 없이 한 줄로 */
-  overflow-x: auto;           /* 넘치면 좌우(가로) 스크롤 */
-  overflow-y: hidden;
-  padding-bottom: 10px;
-  scroll-snap-type: x proximity;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(234, 88, 12, 0.5) transparent;
-}
-.build-step .chip {
-  flex: 0 0 auto;             /* 칩이 줄어들지 않게 */
-  white-space: nowrap;
-  scroll-snap-align: start;
-}
-.build-step .chip-row::-webkit-scrollbar { height: 9px; }
-.build-step .chip-row::-webkit-scrollbar-thumb {
-  background: rgba(234, 88, 12, 0.5); border-radius: 999px;
-}
-.build-step .chip-row::-webkit-scrollbar-thumb:hover {
-  background: rgba(234, 88, 12, 0.75);
-}
-
-/* 누구와(With) 그리드도 다른 그리드처럼 영역 내부 스크롤 */
-#with-grid {
-  overflow-y: auto; overscroll-behavior: contain;
-  padding: 8px 10px 12px 4px;
-  scrollbar-width: thin; scrollbar-color: rgba(234, 88, 12, 0.55) transparent;
-  max-height: clamp(170px, 27vh, 420px);
-  background: rgba(255, 255, 255, 0.32); border-radius: 18px;
-}
-#with-grid::-webkit-scrollbar { width: 10px; }
-#with-grid::-webkit-scrollbar-thumb { background: rgba(234, 88, 12, 0.5); border-radius: 999px; }
+/* ===== 문장 만들기: 칩은 줄바꿈해서 모두 보이게 (내부 스크롤 없음) ===== */
+#build-activities { min-width: 0; }
+.build-step .chip-row { flex-wrap: wrap; padding-bottom: 4px; }
 
 /* 누구와(With) 칩 선택 색 */
 .chip.with.on { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; border-color: transparent; }
@@ -632,3 +561,6 @@ main { max-width: 980px; margin: 0 auto; padding: 0 16px 50px; }
 .card-tag.tag-tense.tag-past    { background: linear-gradient(135deg, #f97316, #c2410c); }
 .card-tag.tag-tense.tag-present { background: linear-gradient(135deg, #84cc16, #4d7c0f); }
 .card-tag.tag-tense.tag-future  { background: linear-gradient(135deg, #eab308, #a16207); }
+
+/* 시제 배너의 두 번째 질문 */
+.tb-or { font-size: 0.8rem; color: var(--muted); margin: 0 2px; }

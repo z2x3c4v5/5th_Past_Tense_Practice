@@ -2,6 +2,7 @@
  * 🍂 English Time Machine · 과거 · 현재 · 미래 듣고 따라 말하기 웹 앱
  * - 시제 전환: 과거(기본) / 현재 / 미래 — 모든 문장이 시제에 맞게 바뀜
  * - 규칙 / 불규칙 동사 구분 (배지 · 필터 · 변화표)
+ * - 그림: illustrations.js 의 인라인 SVG (외부 이미지 요청 없음)
  * - 음성 출력: Web Speech API (SpeechSynthesis)
  * - 단어 클릭: 단어 발음 + 뜻 풍선(popup)
  * - 문장 만들기: 활동 + 때/장소/누구와 조합 → 검사 + 번역 + 듣기
@@ -42,7 +43,7 @@ function activityItem(act, level, t) {
     en: enSentence(act[k.en], t),
     ko: koSentence(act[k.ko], t),
     emoji: act.emoji,
-    imgPrompt: act.img,
+    art: act.art,
     verb: act.verb,
     regular: act.regular,
     rule: act.rule,
@@ -157,37 +158,21 @@ function buildWords(sentence, verbForms) {
   return frag;
 }
 
-/* ---------- 실사 이미지 ---------- */
-let imageMode = true; // true: 실사 사진, false: 이모지
-function hashSeed(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return h % 100000;
-}
-function imageUrl(prompt) {
-  const p = encodeURIComponent("a bright, friendly, realistic photo of " + prompt + ", for kids");
-  return `https://image.pollinations.ai/prompt/${p}?width=400&height=260&nologo=true&seed=${hashSeed(prompt)}`;
-}
+/* ---------- 일러스트 (인라인 SVG, 외부 이미지 없음) ---------- */
 function makeVisual(item) {
-  let visual;
-  if (imageMode && item.imgPrompt) {
-    visual = document.createElement("img");
-    visual.className = "photo";
-    visual.loading = "lazy";
-    visual.alt = item.en;
-    visual.src = imageUrl(item.imgPrompt);
-    visual.addEventListener("error", () => {
-      const em = document.createElement("div");
-      em.className = "emoji";
-      em.textContent = item.emoji;
-      visual.replaceWith(em);
-    });
-  } else {
-    visual = document.createElement("div");
-    visual.className = "emoji";
-    visual.textContent = item.emoji;
+  const draw = item.art && window.ILLUSTRATIONS && window.ILLUSTRATIONS[item.art];
+  if (draw) {
+    const box = document.createElement("div");
+    box.className = "illus";
+    box.innerHTML = draw();
+    box.setAttribute("role", "img");
+    box.setAttribute("aria-label", item.en);
+    return box;
   }
-  return visual;
+  const em = document.createElement("div");
+  em.className = "emoji";
+  em.textContent = item.emoji;
+  return em;
 }
 
 /* ---------- 동사 배지 (규칙/불규칙, 시제별 모양) ---------- */
@@ -520,7 +505,7 @@ function updateBuildResult() {
   listenBtn.textContent = "🔊 듣기";
   listenBtn.addEventListener("click", () => speak(en));
 
-  const item = { en, ko, emoji: buildActivity.emoji, imgPrompt: buildActivity.img, verb: buildActivity.verb,
+  const item = { en, ko, emoji: buildActivity.emoji, art: buildActivity.art, verb: buildActivity.verb,
     regular: buildActivity.regular, rule: buildActivity.rule, tense, type: "combo" };
   const starBtn = document.createElement("button");
   starBtn.className = "btn";
@@ -573,7 +558,7 @@ function isSelected(en) { return selected.has(en); }
 function toggleSelect(item, type) {
   if (selected.has(item.en)) selected.delete(item.en);
   else selected.set(item.en, {
-    en: item.en, ko: item.ko, emoji: item.emoji, imgPrompt: item.imgPrompt,
+    en: item.en, ko: item.ko, emoji: item.emoji, art: item.art,
     verb: item.verb, regular: item.regular, rule: item.rule,
     tense: item.tense || tense, type: type || "suggest",
   });
@@ -805,14 +790,16 @@ function renderTenseBanner() {
   el.innerHTML = "";
   const q = document.createElement("div");
   q.className = "tb-q";
-  q.innerHTML = `<span class="tb-icon">${info.icon}</span><b>${info.question}</b><span class="tb-ko">${info.questionKo}</span>`;
+  q.innerHTML = `<span class="tb-icon">${info.icon}</span><b>${info.question}</b>` +
+    (info.question2 ? `<span class="tb-or">또는</span><b>${info.question2}</b>` : "") +
+    `<span class="tb-ko">${info.questionKo}</span>`;
   const a = document.createElement("div");
   a.className = "tb-a";
   a.innerHTML = `답: <b>${info.answerForm}</b> <span class="tb-ex">→ ${info.example}</span>`;
   const btn = document.createElement("button");
   btn.className = "tb-listen";
   btn.textContent = "🔊 질문 듣기";
-  btn.addEventListener("click", () => speak(info.question));
+  btn.addEventListener("click", () => info.question2 ? speakSequence([info.question, info.question2]) : speak(info.question));
   el.append(q, a, btn);
 }
 
