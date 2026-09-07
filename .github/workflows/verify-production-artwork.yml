@@ -1,0 +1,59 @@
+name: Verify production artwork
+on:
+  push:
+    branches: [main]
+    paths: [worksheet.js, index.html, 'img/**', .github/workflows/verify-production-artwork.yml]
+permissions:
+  contents: read
+jobs:
+  verify-live-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify production URL, original images, and supplementary images
+        env:
+          SITE: https://5th-past-tense-practice.vercel.app/
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, hashlib, json, os, re, time, urllib.request
+          from pathlib import Path
+          site = os.environ['SITE']
+          sha = os.environ['GITHUB_SHA']
+          expected = Path('worksheet.js').read_bytes()
+          def get(path, attempt=0):
+              req = urllib.request.Request(site + path + '?artwork_check=' + sha + '&attempt=' + str(attempt), headers={'Cache-Control': 'no-cache', 'User-Agent': 'PastTenseArtworkVerification/1.0'})
+              with urllib.request.urlopen(req, timeout=25) as response:
+                  assert response.status == 200
+                  return response.read()
+          for attempt in range(72):
+              try:
+                  if get('worksheet.js', attempt) == expected:
+                      break
+              except Exception as exc:
+                  print(type(exc).__name__, 'while waiting for deployment')
+              time.sleep(5)
+          else:
+              raise RuntimeError('Production has not served this commit within the verification window.')
+          html = get('').decode()
+          assert 'worksheet.js?v=artwork-20260907-1' in html
+          paths = sorted(set(re.findall(r'img:\s*"([^"]+)"', expected.decode())))
+          assert len(paths) >= 38
+          assert len([p for p in paths if p.endswith('.png')]) == 21
+          def verify(path):
+              actual = get(path)
+              local = Path(path).read_bytes()
+              assert hashlib.sha256(actual).digest() == hashlib.sha256(local).digest(), path
+              return {'path': path, 'bytes': len(actual), 'sha256': hashlib.sha256(actual).hexdigest(), 'status': 200}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+              verified = list(pool.map(verify, paths))
+          report = {'url': site, 'commit': sha, 'original_images_verified': 21, 'supplementary_images_verified': len(paths)-21, 'images': verified}
+          Path('production-artwork-verification.json').write_text(json.dumps(report, indent=2))
+          print(json.dumps(report, indent=2))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('## Production artwork verified\n\n' + site + '\n\nOriginal worksheet images: **21, all preserved**.\n\nSupplementary images: **' + str(len(paths)-21) + ', all served successfully**.\n\nAll image bytes match the committed files.\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-artwork-verification
+          path: production-artwork-verification.json
