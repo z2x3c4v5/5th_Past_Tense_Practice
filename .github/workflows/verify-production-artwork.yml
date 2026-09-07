@@ -36,10 +36,11 @@ jobs:
           else:
               raise RuntimeError('Production has not served this commit within the verification window.')
           html = get('').decode()
-          assert 'worksheet.js?v=artwork-20260907-1' in html
+          assert 'worksheet.js?v=artwork-20260908-complete' in html
           paths = sorted(set(re.findall(r'img:\s*"([^"]+)"', expected.decode())))
-          assert len(paths) >= 38
+          assert len(paths) == 51
           assert len([p for p in paths if p.endswith('.png')]) == 21
+          assert len([p for p in paths if p.startswith('img/supplementary/')]) == 30
           def verify(path):
               actual = get(path)
               local = Path(path).read_bytes()
