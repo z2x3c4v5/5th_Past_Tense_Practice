@@ -1,0 +1,24 @@
+{
+  "base_url": "https://s3.amazonaws.com/document-export-us1.canva.com/T4Whc/DAHUhoT4Whc/1/thumbnail/",
+  "access_key": "AKIAQYCGKMUHVZ3RB6IW",
+  "response_expires": "Mon, 07 Sep 2026 15:42:46 GMT",
+  "images": [
+    {"past":"joined","page":1,"date":"20260907T021908Z","expires":48218,"signature":"7f470a483be952ad668d576bb6454c88c736a2a430c59821ec57732bf5e4cd6d"},
+    {"past":"watched","page":2,"date":"20260907T003239Z","expires":54607,"signature":"fbab97f4379abe7e63f7b89b05731c8befbfb665db56d77223fd780b9db440cd"},
+    {"past":"visited","page":3,"date":"20260906T210230Z","expires":67216,"signature":"510c17b03129f856127f0af34acf2ad898dfe0b16bd3f600911dcfff60297cb9"},
+    {"past":"learned","page":4,"date":"20260906T155303Z","expires":85783,"signature":"2015655e5345034006562e6b80c25263b3f2683552b9aaf3396883952e3f45da"},
+    {"past":"had","page":5,"date":"20260906T151518Z","expires":88048,"signature":"aa984ca0c3a39bdd7685849870278fe2511a61ebf678fdbd6f494edd15150129"},
+    {"past":"got","page":6,"date":"20260906T224828Z","expires":60858,"signature":"b9c3ab50ddf502f63f1376e48af607b323b3319f1356e797551af27fc223ffc0"},
+    {"past":"stood","page":7,"date":"20260907T015319Z","expires":49767,"signature":"70a4d9251c48f3553d6d4062ed6badb8e92001d640025f0716e9b9d52dda5902"},
+    {"past":"did","page":8,"date":"20260906T183923Z","expires":75803,"signature":"0b99a71ca73fd7e7b62e16bfe65903175efff6a08727a707121e21f23bce9363"},
+    {"past":"taught","page":9,"date":"20260907T072256Z","expires":29990,"signature":"b29c82c2c8c0190f518955726a6c4000ed0c1b9bd5ba7f7e20f2723dfb1905c5"},
+    {"past":"put","page":10,"date":"20260906T195546Z","expires":71220,"signature":"ab495e014ea5c7f4b081d3639c41436c39925dd0d2d5b35139b9bcbb5c8ce676"},
+    {"past":"rode","page":11,"date":"20260907T131415Z","expires":8911,"signature":"819800b25f76d4ec3d774f7a71424bcad2d7c4a3133e912e0ca06e41bb6077d9"},
+    {"past":"drew","page":12,"date":"20260906T202252Z","expires":69594,"signature":"de82734ac1fef5742fa7310ca059387755abc03882000b7f371b2aee72b33974"},
+    {"past":"met","page":13,"date":"20260907T051032Z","expires":37934,"signature":"0dc4284ce08795daa0f241c72bdfbc16924e3f30f515c34e94a20626b8d7a4f5"},
+    {"past":"said","page":14,"date":"20260907T092827Z","expires":22459,"signature":"21899454c107827d7766e63ec8d109f7d0ad1021f7d4210882b208d412a032b5"},
+    {"past":"slept","page":15,"date":"20260906T184136Z","expires":75670,"signature":"e4a165b2a0dd6ac608790492377c92f56f2dc1d669673a5700f03fb337fa91dd"},
+    {"past":"used","page":16,"date":"20260906T220954Z","expires":63172,"signature":"ed8c6b1ac069dbf998318d5ac7740e6eca4f2071e22911a7961c05037487d6f9"},
+    {"past":"grew","page":17,"date":"20260907T063120Z","expires":33086,"signature":"fdd8ccf6dc9a3f2232c466af47ff275a1e24cc9560319f4d6eb3c0cb8f1958f9"}
+  ]
+}
