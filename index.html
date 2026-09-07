@@ -3,21 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Summer Plan Makers · 여름방학 영어</title>
+  <title>English Time Machine · 과거·현재·미래 영어</title>
   <link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="app-header">
-    <div class="sun"></div>
-    <div class="cloud cloud1"></div>
-    <div class="cloud cloud2"></div>
-    <h1>🏖️ Summer Plan Makers</h1>
-    <p class="subtitle">What will you do this summer? · 여름방학 계획을 영어로 말해 봐요!</p>
+    <div class="leaf leaf1">🍁</div>
+    <div class="leaf leaf2">🍂</div>
+    <div class="leaf leaf3">🍁</div>
+    <div class="leaf leaf4">🍂</div>
+    <div class="leaf leaf5">🌰</div>
+    <h1>🍂 English Time Machine</h1>
+    <p id="subtitle" class="subtitle">What did you do this summer? · 여름방학에 한 일을 영어로 말해 봐요!</p>
+
+    <!-- ⏪ 과거 / ⏺ 현재 / ⏩ 미래 -->
+    <div class="tense-switch" role="tablist" aria-label="시제 선택">
+      <button class="tense-btn active" data-tense="past">⏪ 과거 <small>did · ~했어</small></button>
+      <button class="tense-btn" data-tense="present">⏺ 현재 <small>do · ~해</small></button>
+      <button class="tense-btn" data-tense="future">⏩ 미래 <small>will · ~할 거야</small></button>
+    </div>
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="suggest">☀️ 할 일 말하기</button>
+    <button class="tab-btn active" data-tab="suggest">🗣️ 한 일 말하기</button>
+    <button class="tab-btn" data-tab="verbs">🔤 동사 변화표</button>
     <button class="tab-btn" data-tab="words">📅 때·장소·누구와</button>
     <button class="tab-btn" data-tab="build">🧩 문장 만들기</button>
     <button class="tab-btn" data-tab="practice">🎤 내 문장 연습 <span id="practice-count" class="tab-count">0</span></button>
@@ -31,10 +41,11 @@
   </div>
 
   <main>
-    <!-- ===== 할 일 말하기 (I'll ~) ===== -->
+    <!-- ===== 한 일 말하기 ===== -->
     <section id="tab-suggest" class="tab-panel active">
       <div class="section-block">
-        <h2>여름방학에 할 일 <span class="count">96개</span></h2>
+        <div id="tense-banner" class="tense-banner"></div>
+        <h2><span id="suggest-title">여름방학에 한 일</span> <span id="suggest-count" class="count">96개</span></h2>
         <div class="level-switch">
           <button class="level-btn active" data-level="beginner">초급</button>
           <button class="level-btn" data-level="intermediate">중급</button>
@@ -42,32 +53,64 @@
         </div>
         <div class="cat-switch">
           <button class="cat-btn active" data-cat="all">전체</button>
-          <button class="cat-btn" data-cat="make">🌱 만들기·꾸미기</button>
-          <button class="cat-btn" data-cat="active">🏃 운동·배우기</button>
-          <button class="cat-btn" data-cat="trip">🏖️ 나들이·여행</button>
+          <button class="cat-btn" data-cat="make">🍪 만들기·체험</button>
+          <button class="cat-btn" data-cat="active">🏀 운동·배우기</button>
+          <button class="cat-btn" data-cat="trip">🎡 나들이·여행</button>
           <button class="cat-btn" data-cat="home">🎮 놀이·취미</button>
         </div>
-        <p class="hint">난이도와 활동 종류를 고르면 종류마다 <b>7~9가지</b> 문장이 나와요. 인생네컷·워터파크·노래방·떡볶이·폰게임처럼 너희가 좋아하는 활동도 많아! 단어를 누르면 뜻과 발음을 알 수 있고, 마음에 드는 문장은 <b>⭐</b>로 연습 목록에 담아보세요.</p>
+        <!-- 과거 시제일 때만 보이는 규칙/불규칙 필터 -->
+        <div id="reg-switch" class="reg-switch">
+          <span class="reg-label">동사 종류</span>
+          <button class="reg-btn active" data-reg="all">전체</button>
+          <button class="reg-btn reg" data-reg="regular">✅ 규칙 동사 (-ed)</button>
+          <button class="reg-btn irr" data-reg="irregular">🔀 불규칙 동사</button>
+        </div>
+        <p id="suggest-hint" class="hint"></p>
         <div id="suggestion-grid" class="card-grid five"></div>
+      </div>
+    </section>
+
+    <!-- ===== 동사 변화표 ===== -->
+    <section id="tab-verbs" class="tab-panel">
+      <div class="section-block">
+        <h2>🔤 동사 변화표 <span class="count" id="verb-count"></span></h2>
+        <p class="hint">
+          <b>과거</b>를 말할 때는 동사 모양이 바뀌어요. <b>✅ 규칙 동사</b>는 뒤에 <b>-ed</b>를 붙이고,
+          <b>🔀 불규칙 동사</b>는 모양이 제멋대로 바뀌어서 <b>외워야</b> 해요.
+          카드를 누르면 <b>원형 → 과거형</b>을 차례로 들려줘요. (현재는 원형 그대로, 미래는 <b>will + 원형</b>!)
+        </p>
+        <div class="verb-legend">
+          <span class="vl reg">✅ 규칙: play → play<b>ed</b></span>
+          <span class="vl irr">🔀 불규칙: go → <b>went</b></span>
+        </div>
+      </div>
+      <div class="section-block">
+        <h3 class="verb-title reg">✅ 규칙 동사 <span class="verb-sub">(-ed 를 붙여요)</span></h3>
+        <div id="rule-tips" class="rule-tips"></div>
+        <div id="regular-grid" class="verb-grid"></div>
+      </div>
+      <div class="section-block">
+        <h3 class="verb-title irr">🔀 불규칙 동사 <span class="verb-sub">(모양이 바뀌어요 — 외우기!)</span></h3>
+        <div id="irregular-grid" class="verb-grid"></div>
       </div>
     </section>
 
     <!-- ===== 때 · 장소 · 누구와 ===== -->
     <section id="tab-words" class="tab-panel">
-      <p class="hint" style="margin-bottom:18px">💡 <b>What will you do this summer?</b> 의 답(<b>I'll ~</b>)에 아래 표현을 <b>덧붙여</b> 문장을 더 풍부하게 만들어요. 질문에 이미 <b>this summer</b>(이번 여름) 시점이 있으니, 답에는 시점을 또 말하지 않고 <b>얼마나 자주·어디서·누구와</b> 를 더해요.</p>
+      <p id="words-hint" class="hint" style="margin-bottom:18px"></p>
       <div class="section-block">
         <h2>📅 때 (When) <span class="count">8개</span></h2>
-        <p class="hint">얼마나 자주·언제 할지 더해요. (예: I'll read books <b>every day</b>.)</p>
+        <p id="when-hint" class="hint"></p>
         <div id="day-grid" class="card-grid five"></div>
       </div>
       <div class="section-block">
         <h2>📍 장소 (Where) <span class="count">12개</span></h2>
-        <p class="hint">어디서 할지 더해요. (예: I'll play soccer <b>at the park</b>.)</p>
+        <p id="where-hint" class="hint"></p>
         <div id="place-grid" class="card-grid five"></div>
       </div>
       <div class="section-block">
         <h2>👫 누구와 (With whom) <span class="count">8개</span></h2>
-        <p class="hint">누구와 함께할지 더해요. (예: I'll go to a water park <b>with my friends</b>.)</p>
+        <p id="with-hint" class="hint"></p>
         <div id="with-grid" class="card-grid five"></div>
       </div>
     </section>
@@ -76,17 +119,17 @@
     <section id="tab-build" class="tab-panel">
       <div class="section-block">
         <h2>🧩 나만의 문장 만들기</h2>
-        <p class="hint">① <b>할 일</b>과 ② <b>때·장소</b>를 골라 나만의 여름 계획 문장을 만들어 보세요! 문장이 맞는지 확인하고, 전체 문장 · 한글 뜻 · 발음까지 알려줄게요.</p>
+        <p id="build-hint" class="hint"></p>
 
         <div class="builder">
           <div class="build-steps">
             <div class="build-step">
-              <h3 class="build-label">1️⃣ 할 일 고르기 <span class="build-sub">(종류별로 골라봐요)</span></h3>
+              <h3 class="build-label">1️⃣ 활동 고르기 <span class="build-sub">(종류별로 골라봐요)</span></h3>
               <div id="build-activities"></div>
             </div>
 
             <div class="build-step">
-              <h3 class="build-label">2️⃣ 언제·어디서·누구와 할지 고르기</h3>
+              <h3 class="build-label">2️⃣ 언제·어디서·누구와 고르기</h3>
               <div class="chip-group-title">📅 때 (When)</div>
               <div id="build-when" class="chip-row"></div>
               <div class="chip-group-title">📍 장소 (Where)</div>
@@ -102,7 +145,7 @@
           </div>
 
           <div id="build-result" class="build-result empty">
-            할 일과 때·장소를 골라보세요! 👆
+            활동과 때·장소를 골라보세요! 👆
           </div>
         </div>
       </div>
@@ -112,9 +155,9 @@
     <section id="tab-practice" class="tab-panel">
       <div class="section-block">
         <h2>🎤 내 문장 연습</h2>
-        <p class="hint">⭐로 담은 문장을 마이크로 말해 <b>정확도</b>를 측정해요. 카드의 <b>🙋 할 일</b> / <b>🧩 내 문장</b> 표시로 어디서 담았는지 알 수 있어요.</p>
+        <p class="hint">⭐로 담은 문장을 마이크로 말해 <b>정확도</b>를 측정해요. 카드의 <b>⏪ 과거 / ⏺ 현재 / ⏩ 미래</b> 표시로 어떤 시제인지, <b>🙋 / 🧩</b> 표시로 어디서 담았는지 알 수 있어요.</p>
         <p id="practice-empty" class="practice-empty">
-          아직 담은 문장이 없어요! <b>할 일 말하기</b>나 <b>문장 만들기</b> 탭에서 <b>⭐</b>로 연습할 문장을 담아보세요.
+          아직 담은 문장이 없어요! <b>한 일 말하기</b>나 <b>문장 만들기</b> 탭에서 <b>⭐</b>로 연습할 문장을 담아보세요.
         </p>
         <div id="practice-list" class="card-grid practice-grid"></div>
       </div>
@@ -122,7 +165,7 @@
   </main>
 
   <footer class="app-footer">
-    <span class="voice-status">5학년 영어 · 6단원 What will you do this summer? 🌻</span>
+    <span class="voice-status">5학년 영어 · What did you do this summer? 🍁 과거 · 현재 · 미래</span>
   </footer>
 
   <script src="data.js"></script>

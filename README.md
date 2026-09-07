@@ -1,21 +1,23 @@
-# 6단원 · What will you do this summer?
+# 🍂 English Time Machine · 과거 · 현재 · 미래
 
-5학년 영어 **6단원**(여름방학 계획 말하기) 학습용 웹앱입니다.
-교과서의 6개 표현(`I'll grow tomatoes.` 등)뿐 아니라 **다양한 여름 활동**을
-듣고·따라 말하며 익히고, **나만의 문장까지 직접 만들어 볼 수 있도록** 만들었습니다.
-(5단원 *Let's ~* 페이지와 같은 구성, ☀️ 여름 테마 디자인)
+5학년 영어 **과거형 단원**(What did you do this summer?) 학습용 웹앱입니다.
+6단원(미래형 *What will you do this summer?*) 페이지를 바탕으로, **과거형을 기본**으로 하고
+**현재 · 미래 표현도 버튼 하나로 바꿔 볼 수 있게** 만들었습니다. (🍁 가을 테마 디자인)
 
 ## 기능
 
-- ☀️ **할 일 말하기 (I'll ~)** — 초급·중급·고급 난이도 × 4가지 활동 종류
-  (🌱 기르기·만들기 / 🏃 운동·배우기 / 🏖️ 나들이·여행 / 📚 집·취미), **종류마다 6문장씩, 총 72문장**
-  - 교과서 6표현 모두 포함: grow tomatoes · join a science camp · go to the beach · read many books · learn taekwondo · visit my grandpa
-- 📅 **때·장소 표현** — 언제(this summer, every day…) · 어디서(at the beach, at the park…)
-- 🧩 **나만의 문장 만들기** — `할 일` + `때·장소`를 골라 문장을 조합
-  - 어색한 조합(장소 중복 등)은 **맞는지 검사**해 알려주고, 올바른 문장은 **전체 문장 + 한글 번역 + 듣기(TTS)** 제공
+- ⏪⏺⏩ **시제 스위치** — 헤더의 `과거(did) / 현재(do) / 미래(will)` 버튼으로 전체 페이지의 문장·질문·때 표현이 한 번에 바뀝니다. **기본값은 과거**.
+  - 과거 `I played basketball.` · 현재 `I play basketball.` · 미래 `I'll play basketball.`
+- 🗣️ **한 일 말하기** — 초급·중급·고급 난이도 × 4가지 활동 종류 (🍪 만들기·체험 / 🏀 운동·배우기 / 🎡 나들이·여행 / 🎮 놀이·취미), **32가지 활동 × 3단계 = 96문장**
+  - 교과서 주요 표현 6개 모두 포함: `I played basketball.` · `I visited my grandmother.` · `I picked watermelons.` · `I made cookies.` · `I swam in the sea.` · `I went to a festival.`
+  - 과거 시제에서는 카드마다 **✅ 규칙(-ed) / 🔀 불규칙** 배지(`play → played`, `go → went`)가 붙고, 문장 속 과거형 동사가 강조되며, **동사 종류 필터**로 규칙/불규칙만 골라 볼 수 있음
+- 🔤 **동사 변화표** — 규칙 동사(-ed / -d / y→ied / 자음+ed 규칙 설명)와 불규칙 동사를 나눠 보여주고, 카드를 누르면 **원형 → 과거형** 순서로 들려줌
+- 📅 **때·장소·누구와** — 때(When)는 시제마다 다름 (과거: yesterday, last weekend, on Chuseok… / 현재: every day, on Sundays… / 미래: tomorrow, this fall…)
+- 🧩 **나만의 문장 만들기** — `활동` + `때·장소·누구와`를 골라 현재 시제에 맞는 문장을 조합
+  - 어색한 조합(장소 중복)은 **맞는지 검사**해 알려주고, 올바른 문장은 **전체 문장 + 한글 번역 + 동사 배지 + 듣기(TTS)** 제공
   - 🎲 무작위 조합 버튼, ⭐로 연습 목록에 담기
-- 🎤 **내 문장 연습** — ⭐로 담은 문장(고른 할 일 / 내가 만든 문장)을 마이크로 말하면 **발음 정확도** 측정 (Chrome 권장)
-- 단어 클릭 시 **뜻 풍선 + 발음**, 말하기 **속도 조절** 슬라이더
+- 🎤 **내 문장 연습** — ⭐로 담은 문장(시제 태그 표시)을 마이크로 말하면 **발음 정확도** 측정 (Chrome 권장)
+- 단어 클릭 시 **뜻 풍선 + 발음** (과거형 단어는 `go 의 과거형 (불규칙)` 처럼 설명), 말하기 **속도 조절** 슬라이더
 
 브라우저 내장 **Web Speech API**(음성 합성·음성 인식)를 사용합니다.
 선택한 문장과 연습 기록은 브라우저(localStorage)에 저장됩니다.
@@ -28,7 +30,19 @@
 
 | 파일 | 설명 |
 |------|------|
-| `index.html` | 화면 구조(탭·섹션) |
-| `style.css`  | 디자인·여름 테마 |
-| `data.js`    | 문장·표현·단어 뜻·문장 만들기 데이터 |
-| `app.js`     | 음성·단어 풍선·문장 만들기·연습 채점 로직 |
+| `index.html` | 화면 구조(시제 스위치·탭·섹션) |
+| `style.css`  | 디자인·가을 테마 |
+| `data.js`    | 활동 32개(`{원형\|과거형}` 템플릿, 규칙/불규칙 정보)·때/장소/누구와·단어 뜻 데이터 |
+| `app.js`     | 시제 전환·문장 생성·동사 변화표·음성·문장 만들기·연습 채점 로직 |
+
+## 데이터 형식 (data.js)
+
+```js
+{ cat: "active", emoji: "🏀", verb: ["play", "played"], regular: true, rule: "ed", place: false,
+  base: "{play|played} basketball",            ko:    "나는 농구를 {했어|해|할 거야}.",
+  mid:  "{play|played} basketball with my friends", koMid: "...",
+  adv:  "{play|played} basketball and {win|won} the game", koAdv: "..." }
+```
+
+- 영어 템플릿 `{원형|과거형}` → 과거는 `I + 과거형`, 현재는 `I + 원형`, 미래는 `I'll + 원형`
+- 한글 템플릿 `{과거|현재|미래}`
