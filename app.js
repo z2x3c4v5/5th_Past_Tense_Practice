@@ -3,7 +3,8 @@
  * - 타이핑 없음.
  * - 한 줄 = [단어 (누르면 발음)] [그림] [문장 · 🔊 듣기 · 🎙️ 말하기]
  * - Day 1 ~ 6 = 워드 학습지 1~3 앞·뒷면, 📘 = 교과서 주요 표현
- * - 그림: 학습지에 있던 그림(img/) → 없으면 같은 스타일로 생성 → 실패하면 SVG
+ * - 그림: 지정 그림(img/) → img/과거형.* 자동 탐색 → 같은 스타일로 생성 → 실패하면 SVG
+ *   (주소에 ASSET_VERSION 을 붙여 새로 올린 그림이 캐시에 가려지지 않게 함)
  * - 음성 출력: SpeechSynthesis / 채점: SpeechRecognition (Chrome 권장)
  * ========================================================= */
 
@@ -90,6 +91,24 @@ function genImageUrl(prompt) {
   const p = encodeURIComponent(`${IMAGE_STYLE}, ${prompt}`);
   return `https://image.pollinations.ai/prompt/${p}?width=440&height=360&nologo=true&seed=${hashSeed(prompt)}`;
 }
+/* 로컬 그림 주소에 버전을 붙여 브라우저가 옛 그림을 캐시에서 꺼내 쓰지 않게 함 */
+function withVersion(src) {
+  if (!src || /^(https?:)?\/\//i.test(src) || /^data:/i.test(src)) return src;
+  const v = typeof ASSET_VERSION !== "undefined" ? ASSET_VERSION : "1";
+  return src + (src.includes("?") ? "&" : "?") + "v=" + v;
+}
+/* 그림 후보를 순서대로: 지정된 img → img/과거형.* → img/현재형.* → supplementary → 생성 그림 */
+function imageCandidates(r) {
+  const list = [];
+  const add = s => { if (s && !list.includes(s)) list.push(s); };
+  add(r.img);
+  [r.past, r.base].filter(Boolean).forEach(name => {
+    ["png", "jpg", "jpeg", "webp", "gif"].forEach(ext => add(`img/${name}.${ext}`));
+    ["webp", "png", "jpg"].forEach(ext => add(`img/supplementary/${name}.${ext}`));
+  });
+  if (r.prompt) add(genImageUrl(r.prompt));
+  return list;
+}
 function makePicture(r) {
   const box = document.createElement("div");
   box.className = "pic";
@@ -98,11 +117,17 @@ function makePicture(r) {
     box.innerHTML = draw ? draw() : `<div class="pic-emoji">📝</div>`;
     box.classList.add("svg");
   };
-  const src = r.img || (r.prompt ? genImageUrl(r.prompt) : null);
-  if (!src) { showSvg(); return box; }
+  const candidates = imageCandidates(r);
+  if (!candidates.length) { showSvg(); return box; }
   const img = document.createElement("img");
-  img.alt = r.en; img.loading = "lazy"; img.src = src;
-  img.addEventListener("error", showSvg);
+  img.alt = r.en; img.loading = "lazy";
+  let i = 0;
+  const tryNext = () => {
+    if (i >= candidates.length) { img.remove(); showSvg(); return; }
+    img.src = withVersion(candidates[i++]);
+  };
+  img.addEventListener("error", tryNext);
+  tryNext();
   box.appendChild(img);
   return box;
 }

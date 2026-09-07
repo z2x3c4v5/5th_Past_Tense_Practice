@@ -3,7 +3,8 @@
  * - 워드 학습지 "5학년 · 7단원 ENGLISH WORKSHEET" (학습지 1~3, 앞/뒷면)
  *   → 하루 한 면 (Day 1 ~ Day 6)
  * - 한 줄 = 단어 한 개 :  [뜻, 현재형, 과거형, 문장, 문장 뜻, 옵션]
- *     옵션.img      : 학습지에 들어 있던 그림 (img/*.png)
+ *     옵션.img      : 그림 파일 (img/*.png, img/supplementary/*.webp)
+ *                     → img 폴더에 "과거형.png" 처럼 올린 그림은 옵션이 없어도 자동으로 찾음
  *     옵션.prompt   : 학습지 그림이 없는 문장 → 같은 카툰 스타일로 그림 생성
  *     옵션.art      : 그림을 못 불러올 때 대신 보여줄 SVG (illustrations.js)
  *     옵션.textbook : 📘 교과서 주요 표현
@@ -11,6 +12,9 @@
  *   played basketball · visited my grandmother · picked watermelons ·
  *   made cookies · swam in the sea · went to a festival
  * ========================================================= */
+
+/* 그림·스크립트 캐시 무효화 버전 — img 폴더에 그림을 새로 올리거나 바꾸면 이 값을 바꿔 주세요 */
+const ASSET_VERSION = "artwork-20260907-2";
 
 const QUESTION = { en: "What did you do this summer?", en2: "What did you do yesterday?", ko: "여름방학에 / 어제 무엇을 했니?" };
 

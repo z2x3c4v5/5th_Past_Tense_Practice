@@ -12,7 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check lesson data syntax
-        run: node --check worksheet.js
+        run: node --check worksheet.js && node --check app.js
+      - name: Check every image in img/ is connected and every connected image exists
+        run: node tools/check-images.js
       - name: Verify production URL, original images, and supplementary images
         env:
           SITE: https://5th-past-tense-practice.vercel.app/
@@ -45,7 +47,7 @@ jobs:
           else:
               raise RuntimeError('Production has not served this commit within the verification window.')
           html = get('').decode()
-          assert 'worksheet.js?v=artwork-20260907-1' in html
+          assert 'worksheet.js?v=artwork-20260907-2' in html
           paths = sorted(set(re.findall(r'img:\s*"([^"]+)"', expected.decode())))
           # Original images are identified by filename, not PNG extension:
           # the user uploaded another 13 PNG files alongside the original 21.

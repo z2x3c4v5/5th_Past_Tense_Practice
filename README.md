@@ -34,7 +34,8 @@
 
 ## 기타
 
-- 그림: 워드 학습지에 들어 있던 **카툰 그림 21장**(`img/`)을 그대로 사용. 학습지에 그림이 없는 문장은 같은 스타일로 **생성한 이미지**를 불러오고, 불러오지 못하면 `illustrations.js`의 SVG 로 대체
+- 그림: `img/` 폴더의 **그림 51장**(학습지 카툰 21장 + 추가 PNG 13장 + `img/supplementary/` WebP 17장)을 문장마다 사용. 그림을 못 불러오면 `img/과거형.png` 같은 이름의 파일을 자동으로 찾고, 그래도 없으면 생성 이미지 → `illustrations.js`의 SVG 로 대체
+- **그림을 새로 올리거나 바꿨는데 화면에 안 보이면**: `worksheet.js`의 `ASSET_VERSION` 값을 바꾸고 `index.html`의 `?v=` 태그도 같은 값으로 맞추면 브라우저 캐시를 건너뛰고 새 그림이 나옵니다. (`node tools/check-images.js` 로 연결 상태 점검)
 - 단어를 누르면 **뜻 풍선 + 발음** (과거형은 `go 의 과거형 (불규칙)` 처럼 설명)
 - 말하기 속도 슬라이더, 질문(`What did you do this summer? / yesterday?`) 듣기
 - 진행 기록은 브라우저(localStorage)에 저장. 마이크 채점은 **Chrome** 권장(지원 안 되는 브라우저는 듣기만으로 완료 처리)
@@ -50,7 +51,8 @@
 | `index.html` | 화면 뼈대 (헤더 · Day 선택 · 학습지 영역) |
 | `style.css` | 가을 테마 디자인 |
 | `worksheet.js` | Day 1~6 단어·문장 데이터, 교과서 표현, 단어 뜻 사전 |
-| `img/*.png` | 워드 학습지에서 꺼낸 문장 그림 21장 |
+| `img/*.png`, `img/supplementary/*.webp` | 문장 그림 51장 (파일 이름 = 과거형) |
+| `tools/check-images.js` | img 폴더 그림과 `worksheet.js` 연결 상태 점검 |
 | `illustrations.js` | 이미지를 못 불러올 때 쓰는 SVG 대체 그림 |
 | `app.js` | 음성 출력·인식, 카드 렌더링, 진행 저장·도장 |
 | `worksheets/past_tense_worksheet.docx` | 원본 워드 학습지 |
