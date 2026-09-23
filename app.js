@@ -283,8 +283,117 @@ function makeRow(r, i, kind, onChange) {
   return line;
 }
 
+
+/* ---------- Test A / Test B (최종평가 워크시트와 동일) ---------- */
+const PAST_TENSE_TESTS = {
+  testA: {
+    label: "Test A",
+    rows: [
+      { img:"img/played.png", sentence:"I ______ basketball.", ko:"나는 농구를 했습니다.", choices:["play","played"], answer:"played" },
+      { img:"img/hugged.png", sentence:"I ______ my grandma.", ko:"나는 할머니를 껴안았습니다.", choices:["hug","hugged"], answer:"hugged" },
+      { img:"img/picked.png", sentence:"I ______ watermelons.", ko:"나는 수박을 땄습니다.", choices:["pick","picked"], answer:"picked" },
+      { img:"img/baked.png", sentence:"I ______ cookies.", ko:"나는 쿠키를 구웠습니다.", choices:["bake","baked"], answer:"baked" },
+      { img:"img/swam.png", sentence:"I ______ in the sea.", ko:"나는 바다에서 수영했습니다.", choices:["swimmed","swam"], answer:"swam" },
+      { img:"img/bought.png", sentence:"I ______ fruit.", ko:"나는 과일을 샀습니다.", choices:["buyed","bought"], answer:"bought" },
+      { img:"img/ran.png", sentence:"I ______ fast.", ko:"나는 빨리 달렸습니다.", choices:["runned","ran"], answer:"ran" },
+      { img:"img/sat.png", sentence:"I ______ on the chair.", ko:"나는 의자에 앉았습니다.", choices:["sitted","sat"], answer:"sat" },
+      { img:"img/drank.png", sentence:"I ______ milk.", ko:"나는 우유를 마셨습니다.", choices:["drinked","drank"], answer:"drank" },
+      { img:"img/read.png", sentence:"I ______ a book.", ko:"나는 책을 읽었습니다.", answer:"read" },
+      { img:"img/wrote.png", sentence:"I ______ a letter.", ko:"나는 편지를 썼습니다.", answer:"wrote" },
+      { img:"img/came.png", sentence:"I ______ to school.", ko:"나는 학교에 왔습니다.", answer:"came" }
+    ]
+  },
+  testB: {
+    label: "Test B",
+    rows: [
+      { img:"img/walked.png", sentence:"I ______ in the park.", ko:"나는 공원에서 걸었습니다.", choices:["walk","walked"], answer:"walked" },
+      { img:"img/talked.png", sentence:"I ______ with my friend.", ko:"나는 친구와 이야기했습니다.", choices:["talk","talked"], answer:"talked" },
+      { img:"img/washed.png", sentence:"I ______ my hands.", ko:"나는 손을 씻었습니다.", choices:["wash","washed"], answer:"washed" },
+      { img:"img/opened.png", sentence:"I ______ the door.", ko:"나는 문을 열었습니다.", choices:["open","opened"], answer:"opened" },
+      { img:"img/ate.png", sentence:"I ______ lunch.", ko:"나는 점심을 먹었습니다.", choices:["eated","ate"], answer:"ate" },
+      { img:"img/listened.png", sentence:"I ______ to music.", ko:"나는 음악을 들었습니다.", choices:["listenned","listened"], answer:"listened" },
+      { img:"img/danced.png", sentence:"I ______.", ko:"나는 춤을 췄습니다.", choices:["danceed","danced"], answer:"danced" },
+      { img:"img/studied.png", sentence:"I ______ English.", ko:"나는 영어를 공부했습니다.", choices:["studyed","studied"], answer:"studied" },
+      { img:"img/stopped.png", sentence:"I ______ the bicycle.", ko:"나는 자전거를 멈췄습니다.", choices:["stoped","stopped"], answer:"stopped" },
+      { img:"img/bought.png", sentence:"I ______ fruit.", ko:"나는 과일을 샀습니다.", answer:"bought" },
+      { img:"img/swam.png", sentence:"I ______ in the sea.", ko:"나는 바다에서 수영했습니다.", answer:"swam" },
+      { img:"img/read.png", sentence:"I ______ a book.", ko:"나는 책을 읽었습니다.", answer:"read" }
+    ]
+  }
+};
+
+function renderTest(box, test) {
+  const head = document.createElement("div");
+  head.className = "sheet-head test-head";
+  head.innerHTML = '<div class="sh-num">📝</div><div class="sh-titles"><div class="sh-title">' + test.label + ' · 과거형 최종평가</div><div class="sh-sub">그림을 보고 문장 속 빈칸에 알맞은 과거형을 쓰세요. 1~4번은 기본형/과거형, 5~9번은 헷갈리는 과거형, 10~12번은 보기 없이 직접 써요.</div></div><div class="sh-meta">ENGLISH TEST · 5학년 7단원<br><b>12문제</b></div>';
+  box.appendChild(head);
+
+  const list = document.createElement("div");
+  list.className = "test-grid";
+  const inputs = [];
+  test.rows.forEach((r, i) => {
+    const card = document.createElement("div");
+    card.className = "test-card";
+    const pic = document.createElement("div");
+    pic.className = "test-pic";
+    const img = document.createElement("img");
+    img.src = withVersion(r.img); img.alt = r.ko;
+    pic.appendChild(img);
+
+    const body = document.createElement("div");
+    body.className = "test-body";
+    const sentence = document.createElement("div");
+    sentence.className = "test-sentence";
+    const parts = r.sentence.split("______");
+    sentence.append(document.createTextNode((i + 1) + ". " + parts[0]));
+    const input = document.createElement("input");
+    input.className = "test-input"; input.type = "text"; input.autocomplete = "off";
+    input.spellcheck = false; input.setAttribute("aria-label", (i + 1) + "번 과거형 답");
+    sentence.appendChild(input);
+    sentence.append(document.createTextNode(parts[1] || ""));
+    inputs.push({ input, row:r, card });
+
+    const ko = document.createElement("div"); ko.className = "test-ko"; ko.textContent = r.ko;
+    body.append(sentence, ko);
+    if (r.choices) {
+      const choices = document.createElement("div"); choices.className = "test-choices";
+      choices.textContent = r.choices[0] + "  /  " + r.choices[1];
+      body.appendChild(choices);
+    } else {
+      const free = document.createElement("div"); free.className = "test-free"; free.textContent = "보기 없이 직접 쓰기";
+      body.appendChild(free);
+    }
+    card.append(pic, body);
+    list.appendChild(card);
+  });
+  box.appendChild(list);
+
+  const actions = document.createElement("div"); actions.className = "test-actions";
+  const result = document.createElement("div"); result.className = "test-result";
+  const check = document.createElement("button"); check.className = "btn test-check"; check.textContent = "✅ 채점하기";
+  const reset = document.createElement("button"); reset.className = "btn ghost"; reset.textContent = "↻ 다시 풀기";
+  check.addEventListener("click", () => {
+    let score = 0;
+    inputs.forEach(({input,row,card}) => {
+      const ok = normalize(input.value) === normalize(row.answer);
+      card.classList.toggle("correct", ok); card.classList.toggle("wrong", !ok);
+      input.classList.toggle("correct", ok); input.classList.toggle("wrong", !ok);
+      if (ok) score++;
+    });
+    result.innerHTML = '<b>' + score + ' / 12</b>' + (score === 12 ? ' 🎉 완벽해요!' : ' · 틀린 문제를 다시 생각해 보세요.');
+    result.scrollIntoView({behavior:"smooth", block:"center"});
+  });
+  reset.addEventListener("click", () => {
+    inputs.forEach(({input,card}) => { input.value=""; input.classList.remove("correct","wrong"); card.classList.remove("correct","wrong"); });
+    result.textContent="";
+    inputs[0].input.focus();
+  });
+  actions.append(check, reset, result);
+  box.appendChild(actions);
+}
+
 /* ---------- Day / 교과서 고르기 ---------- */
-let current = null; // "textbook" | 1..6
+let current = null; // "textbook" | "testA" | "testB" | 1..6
 function nextDay() {
   const n = WORKSHEET_DAYS.find(s => !doneDays[s.day]);
   return n ? n.day : WORKSHEET_DAYS[WORKSHEET_DAYS.length - 1].day;
@@ -313,6 +422,15 @@ function renderStrip() {
     b.addEventListener("click", () => { current = s.day; go(); });
     strip.appendChild(b);
   });
+  ["testA", "testB"].forEach(key => {
+    const t = PAST_TENSE_TESTS[key];
+    const b = document.createElement("button");
+    b.className = "day-chip test-chip" + (current === key ? " on" : "");
+    b.innerHTML = '<span class="dc-day">📝 ' + t.label + '</span><span class="dc-title">최종평가</span><span class="dc-stamp">12문제</span>';
+    b.addEventListener("click", () => { current = key; go(); });
+    strip.appendChild(b);
+  });
+
 }
 function go() { synth.cancel(); hidePopup(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
@@ -338,7 +456,11 @@ function render() {
   renderStrip();
   const box = document.getElementById("sheet");
   box.innerHTML = "";
+  const qb = document.getElementById("question-banner");
+  const isTest = current === "testA" || current === "testB";
+  if (qb) qb.style.display = isTest ? "none" : "";
   if (current === "textbook") renderTextbook(box);
+  else if (isTest) renderTest(box, PAST_TENSE_TESTS[current]);
   else renderDay(box, WORKSHEET_DAYS.find(s => s.day === current));
 }
 
