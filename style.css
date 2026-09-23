@@ -242,3 +242,11 @@ main { max-width: 1000px; margin: 0 auto; padding: 12px 16px 50px; }
   .test-sentence { font-size:1.08rem; }
   .test-input { width:118px; }
 }
+
+.worksheet-links { margin-right:auto; display:flex; gap:8px; flex-wrap:wrap; }
+.worksheet-links .docx-link { margin-right:0; }
+.test-docx-link { background:rgba(124,58,237,.10); color:#6d28d9; }
+.test-docx-link:hover { background:rgba(124,58,237,.18); }
+.btn.test-submit { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; }
+.btn.teacher-unlock { background:linear-gradient(135deg,#7c3aed,#5b21b6); color:#fff; }
+.test-input:disabled { opacity:1; color:#4c1d95; -webkit-text-fill-color:#4c1d95; background:rgba(255,255,255,.55); }
