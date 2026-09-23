@@ -345,19 +345,40 @@ function renderTest(box, test) {
     const sentence = document.createElement("div");
     sentence.className = "test-sentence";
     const parts = r.sentence.split("______");
-    sentence.append(document.createTextNode((i + 1) + ". " + parts[0]));
+    const number = document.createElement("span");
+    number.className = "test-num"; number.textContent = (i + 1) + ". ";
+    sentence.appendChild(number);
+    const addTestWords = text => {
+      text.split(/(\s+)/).forEach(token => {
+        if (!token) return;
+        if (/^\s+$/.test(token)) { sentence.appendChild(document.createTextNode(token)); return; }
+        const span = document.createElement("span");
+        span.className = "word test-word";
+        span.textContent = token;
+        span.addEventListener("click", e => { e.stopPropagation(); showWordPopup(span, token); });
+        sentence.appendChild(span);
+      });
+    };
+    addTestWords(parts[0]);
     const input = document.createElement("input");
     input.className = "test-input"; input.type = "text"; input.autocomplete = "off";
     input.spellcheck = false; input.setAttribute("aria-label", (i + 1) + "번 과거형 답");
     sentence.appendChild(input);
-    sentence.append(document.createTextNode(parts[1] || ""));
+    addTestWords(parts[1] || "");
     inputs.push({ input, row:r, card });
 
     const ko = document.createElement("div"); ko.className = "test-ko"; ko.textContent = r.ko;
     body.append(sentence, ko);
     if (r.choices) {
       const choices = document.createElement("div"); choices.className = "test-choices";
-      choices.textContent = r.choices[0] + "  /  " + r.choices[1];
+      r.choices.forEach((choice, ci) => {
+        if (ci) choices.appendChild(document.createTextNode("  /  "));
+        const w = document.createElement("button");
+        w.type = "button"; w.className = "test-choice-word"; w.textContent = choice;
+        w.title = "누르면 단어 뜻과 발음을 확인해요";
+        w.addEventListener("click", e => { e.stopPropagation(); showWordPopup(w, choice); });
+        choices.appendChild(w);
+      });
       body.appendChild(choices);
     } else {
       const free = document.createElement("div"); free.className = "test-free"; free.textContent = "보기 없이 직접 쓰기";
@@ -376,15 +397,12 @@ function renderTest(box, test) {
   const setTeacherMode = open => {
     teacherOpen = open;
     inputs.forEach(({input,row,card}, i) => {
-      let answer = card.querySelector(".test-answer");
       let listen = card.querySelector(".test-listen");
       if (open) {
-        if (!answer) {
-          answer = document.createElement("div");
-          answer.className = "test-answer";
-          answer.innerHTML = "정답: <b>" + row.answer + "</b>";
-          card.querySelector(".test-body").appendChild(answer);
-        }
+        input.dataset.studentValue = input.value;
+        input.value = row.answer;
+        input.readOnly = true;
+        input.classList.add("teacher-answer");
         if (!listen) {
           listen = document.createElement("button");
           listen.className = "btn listen small test-listen";
@@ -394,7 +412,10 @@ function renderTest(box, test) {
           card.querySelector(".test-body").appendChild(listen);
         }
       } else {
-        if (answer) answer.remove();
+        input.value = input.dataset.studentValue || "";
+        delete input.dataset.studentValue;
+        input.readOnly = false;
+        input.classList.remove("teacher-answer");
         if (listen) listen.remove();
       }
     });
