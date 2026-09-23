@@ -370,25 +370,41 @@ function renderTest(box, test) {
 
   const actions = document.createElement("div"); actions.className = "test-actions";
   const result = document.createElement("div"); result.className = "test-result";
-  const check = document.createElement("button"); check.className = "btn test-check"; check.textContent = "✅ 채점하기";
+  const submit = document.createElement("button"); submit.className = "btn test-submit"; submit.textContent = "📨 답안 제출";
+  const teacher = document.createElement("button"); teacher.className = "btn teacher-unlock"; teacher.textContent = "🔐 교사용 정답 확인";
   const reset = document.createElement("button"); reset.className = "btn ghost"; reset.textContent = "↻ 다시 풀기";
-  check.addEventListener("click", () => {
+
+  let submitted = false;
+  submit.addEventListener("click", () => {
+    const empty = inputs.filter(x => !x.input.value.trim()).length;
+    if (empty && !confirm("아직 " + empty + "문제가 비어 있어요. 그래도 제출할까요?")) return;
+    submitted = true;
+    inputs.forEach(({input}) => input.disabled = true);
+    submit.disabled = true;
+    result.innerHTML = "<b>제출 완료!</b> 선생님이 확인할 때까지 정답은 표시되지 않아요.";
+  });
+
+  teacher.addEventListener("click", () => {
+    const pin = prompt("교사용 PIN을 입력하세요.");
+    if (pin !== "2580") { if (pin !== null) alert("PIN이 맞지 않습니다."); return; }
     let score = 0;
     inputs.forEach(({input,row,card}) => {
       const ok = normalize(input.value) === normalize(row.answer);
       card.classList.toggle("correct", ok); card.classList.toggle("wrong", !ok);
       input.classList.toggle("correct", ok); input.classList.toggle("wrong", !ok);
       if (ok) score++;
+      input.disabled = false;
     });
-    result.innerHTML = '<b>' + score + ' / 12</b>' + (score === 12 ? ' 🎉 완벽해요!' : ' · 틀린 문제를 다시 생각해 보세요.');
+    result.innerHTML = "<b>" + score + " / 12</b>" + (score === 12 ? " 🎉 완벽해요!" : " · 빨간 문제를 다시 확인해 보세요.");
     result.scrollIntoView({behavior:"smooth", block:"center"});
   });
+
   reset.addEventListener("click", () => {
-    inputs.forEach(({input,card}) => { input.value=""; input.classList.remove("correct","wrong"); card.classList.remove("correct","wrong"); });
-    result.textContent="";
+    inputs.forEach(({input,card}) => { input.disabled=false; input.value=""; input.classList.remove("correct","wrong"); card.classList.remove("correct","wrong"); });
+    submitted=false; submit.disabled=false; result.textContent="";
     inputs[0].input.focus();
   });
-  actions.append(check, reset, result);
+  actions.append(submit, teacher, reset, result);
   box.appendChild(actions);
 }
 
