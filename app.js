@@ -426,7 +426,8 @@ function renderTest(box, test) {
   teacher.addEventListener("click", () => {
     if (teacherOpen) { setTeacherMode(false); return; }
     const pin = prompt("교사용 비밀번호를 입력하세요.");
-    const expectedPin = test.label === "Test B" ? "2030" : "2026";\n    if (pin !== expectedPin) { if (pin !== null) alert("비밀번호가 맞지 않습니다."); return; }
+    const expectedPin = test.label === "Test B" ? "2030" : "2026";
+    if (pin !== expectedPin) { if (pin !== null) alert("비밀번호가 맞지 않습니다."); return; }
     setTeacherMode(true);
   });
 
